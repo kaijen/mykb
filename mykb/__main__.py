@@ -65,6 +65,27 @@ def cmd_links(args, cfg) -> None:
         print(f"\n{len(rows)} Link(s)")
 
 
+def cmd_capture(args, cfg) -> None:
+    from .capture import serve
+
+    serve(cfg)
+
+
+def cmd_process(args, cfg) -> None:
+    """Inbox verarbeiten: lokale Quellen indexieren und Links aus Linkwarden ziehen."""
+    from . import links
+    from .ingest import Ingestor
+
+    if getattr(args, "enrich", False):
+        cfg.enrich = True
+    ing = Ingestor(cfg)
+    total = ing.ingest_path(cfg.docs_path, "document")
+    total += ing.ingest_path(cfg.notes_path, "note")
+    logger.info("process_indexed", chunks=total)
+    if links.Linkwarden(cfg).available():
+        links.sync_from_linkwarden(cfg)
+
+
 def cmd_collections(args, cfg) -> None:
     from . import collections as coll
 
@@ -98,6 +119,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_web.add_argument("--tags", default="")
     p_web.add_argument("--enrich", action="store_true", help="Anreicherung (Ollama)")
     p_web.set_defaults(func=cmd_web)
+
+    p_capture = sub.add_parser(
+        "capture", help="Capture-Dienst starten (Erfassen von unterwegs, Tailscale)"
+    )
+    p_capture.set_defaults(func=cmd_capture)
+
+    p_process = sub.add_parser(
+        "process", help="Inbox verarbeiten: index (documents+notes) + links sync"
+    )
+    p_process.add_argument(
+        "--enrich", action="store_true", help="Anreicherung beim Indexieren (Ollama)"
+    )
+    p_process.set_defaults(func=cmd_process)
 
     p_coll = sub.add_parser(
         "collections", help="Themen-Cluster vorschlagen (Auto-Sammlungen)"

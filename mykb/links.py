@@ -65,6 +65,34 @@ class Linkwarden:
                 cursor = last_id
         return out
 
+    def create_link(
+        self,
+        url: str,
+        tags: list[str] | None = None,
+        note: str = "",
+        collection: str = "",
+    ) -> dict:
+        """Ein Bookmark in Linkwarden anlegen (für die Capture-Übergabe).
+
+        Feldnamen/Endpoint sind Linkwarden-versionsabhängig — hier ggf.
+        anpassen.
+        """
+        import httpx
+
+        headers = {"Authorization": f"Bearer {self.token}"}
+        body: dict = {"url": url}
+        if note:
+            body["description"] = note
+        if tags:
+            body["tags"] = [{"name": t} for t in tags]
+        if collection:
+            body["collection"] = {"name": collection}
+
+        with httpx.Client(timeout=self.cfg.http_timeout, headers=headers) as client:
+            resp = client.post(f"{self.base}/api/v1/links", json=body)
+            resp.raise_for_status()
+            return resp.json()
+
     @staticmethod
     def map_item(item: dict) -> dict:
         """Linkwarden-Eintrag auf unsere Felder reduzieren."""
