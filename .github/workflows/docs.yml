@@ -47,9 +47,9 @@ jobs:
 
       - name: Version mit mike deployen
         run: |
-          # Tag v1.2.3 -> Doku-Version "1.2", Alias "latest".
-          RAW="${GITHUB_REF_NAME#v}"
-          VERSION="$(echo "$RAW" | cut -d. -f1-2)"
+          # Volle Version aus dem Tag als Doku-Version (v0.1.0 -> 0.1.0),
+          # Alias "latest". Nur das führende "v" wird entfernt.
+          VERSION="${GITHUB_REF_NAME#v}"
           echo "Deploye Doku-Version ${VERSION} (aus Tag ${GITHUB_REF_NAME})"
           mike deploy --push --update-aliases "${VERSION}" latest
           mike set-default --push latest
