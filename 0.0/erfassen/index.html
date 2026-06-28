@@ -6,19 +6,19 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Selbst gehostete RAG-Pipeline für Information-Security- und Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.">
+        <meta name="description" content="Selbst gehosteter PKM-Speicher: Dokumente, Notizen, Web-Inhalte und eine Linksammlung, semantisch durchsuchbar über einen MCP-Server.">
       
       
         <meta name="author" content="Kai Jendrian">
       
       
-        <link rel="canonical" href="https://kaijen.github.io/mykb/0.0/indexierung/">
+        <link rel="canonical" href="https://kaijen.github.io/mykb/0.0/erfassen/">
       
       
         <link rel="prev" href="../installation/">
       
       
-        <link rel="next" href="../mcp-server/">
+        <link rel="next" href="../links/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Indexierung - mykb — Literatur-RAG</title>
+        <title>Inhalte erfassen - mykb — persönlicher Wissensspeicher</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#indexierung" class="md-skip">
+        <a href="#inhalte-erfassen" class="md-skip">
           Zum Inhalt
         </a>
       
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
-    <a href=".." title="mykb — Literatur-RAG" class="md-header__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-header__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,13 +114,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            mykb — Literatur-RAG
+            mykb — persönlicher Wissensspeicher
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Indexierung
+              Inhalte erfassen
             
           </span>
         </div>
@@ -238,13 +238,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="mykb — Literatur-RAG" class="md-nav__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-nav__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    mykb — Literatur-RAG
+    mykb — persönlicher Wissensspeicher
   </label>
   
     <div class="md-nav__source">
@@ -338,7 +338,7 @@
   <span class="md-ellipsis">
     
   
-    Indexierung
+    Inhalte erfassen
   
 
     
@@ -356,7 +356,7 @@
   <span class="md-ellipsis">
     
   
-    Indexierung
+    Inhalte erfassen
   
 
     
@@ -393,10 +393,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ablauf" class="md-nav__link">
+  <a href="#die-ingest-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ablauf
+        Die Ingest-Pipeline
       
     </span>
   </a>
@@ -404,21 +404,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#klassifizierung" class="md-nav__link">
+  <a href="#felder-in-documents" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Klassifizierung
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#lancedb-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LanceDB-Schema
+        Felder in documents
       
     </span>
   </a>
@@ -429,6 +418,60 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linksammlung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ki-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KI-Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -579,10 +622,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ablauf" class="md-nav__link">
+  <a href="#die-ingest-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ablauf
+        Die Ingest-Pipeline
       
     </span>
   </a>
@@ -590,21 +633,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#klassifizierung" class="md-nav__link">
+  <a href="#felder-in-documents" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Klassifizierung
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#lancedb-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LanceDB-Schema
+        Felder in documents
       
     </span>
   </a>
@@ -628,7 +660,7 @@
 
 
   
-    <a href="https://github.com/kaijen/mykb/edit/main/docs/indexierung.md" title="Seite editieren" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/kaijen/mykb/edit/main/docs/erfassen.md" title="Seite editieren" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -636,61 +668,56 @@
   
 
 
-<h1 id="indexierung">Indexierung<a class="headerlink" href="#indexierung" title="Permanent link">&para;</a></h1>
-<p>Das Skript <code>scripts/index_literature.py</code> überführt die Quelldokumente in
-LanceDB. Pro Lauf wird die Zieltabelle neu gebaut.</p>
+<h1 id="inhalte-erfassen">Inhalte erfassen<a class="headerlink" href="#inhalte-erfassen" title="Permanent link">&para;</a></h1>
+<p>Die Erstellungsseite (Laptop) überführt Quellen in die Tabelle <code>documents</code>.
+Drei Quelltypen kommen hier hinein: <strong>document</strong>, <strong>note</strong> und <strong>web</strong>
+(Bookmarks siehe <a href="../links/">Linksammlung</a>).</p>
 <h2 id="befehle">Befehle<a class="headerlink" href="#befehle" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Alles indexieren (Standards + Research)</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>scripts/index_literature.py<span class="w"> </span>--target<span class="w"> </span>all
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Nur eine Sammlung</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>python<span class="w"> </span>scripts/index_literature.py<span class="w"> </span>--target<span class="w"> </span>standards
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>python<span class="w"> </span>scripts/index_literature.py<span class="w"> </span>--target<span class="w"> </span>research
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Embedding-Dimension kürzen (Matryoshka, spart DB-Platz)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nv">EMBED_DIM</span><span class="o">=</span><span class="m">512</span><span class="w"> </span>python<span class="w"> </span>scripts/index_literature.py<span class="w"> </span>--target<span class="w"> </span>all
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># CPU statt GPU erzwingen (z. B. für VPS-Test)</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nv">EMBED_DEVICE</span><span class="o">=</span>cpu<span class="w"> </span>python<span class="w"> </span>scripts/index_literature.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Lokale Quellen indexieren (alles / nur Dokumente / nur Notizen)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>index<span class="w"> </span>--source<span class="w"> </span>all
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>index<span class="w"> </span>--source<span class="w"> </span>documents
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>index<span class="w"> </span>--source<span class="w"> </span>notes
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Einzelne Web-Seite aufnehmen (HTML -&gt; Text)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>web<span class="w"> </span>https://example.org/artikel<span class="w"> </span>--collection<span class="w"> </span>lesen<span class="w"> </span>--tags<span class="w"> </span>infosec
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Mit KI-Anreicherung (Zusammenfassung + Auto-Tags, siehe KI-Features)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>index<span class="w"> </span>--source<span class="w"> </span>all<span class="w"> </span>--enrich
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Optionen</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nv">EMBED_DIM</span><span class="o">=</span><span class="m">512</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>index<span class="w"> </span>--source<span class="w"> </span>all<span class="w">     </span><span class="c1"># Embedding-Dim kürzen</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nv">EMBED_DEVICE</span><span class="o">=</span>cpu<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>index<span class="w"> </span>--source<span class="w"> </span>all<span class="w">  </span><span class="c1"># CPU erzwingen</span>
 </code></pre></div>
-<h2 id="ablauf">Ablauf<a class="headerlink" href="#ablauf" title="Permanent link">&para;</a></h2>
+<h2 id="die-ingest-pipeline">Die Ingest-Pipeline<a class="headerlink" href="#die-ingest-pipeline" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    A[Quelle&lt;br/&gt;Datei / URL] --&gt; B[Extrahieren&lt;br/&gt;pypdf · trafilatura]
+    B --&gt; C{content_hash&lt;br/&gt;unverändert?}
+    C -- ja --&gt; SKIP[überspringen]
+    C -- nein --&gt; E[Chunking&lt;br/&gt;wortbasiert, Overlap]
+    E --&gt; ENR{--enrich?}
+    ENR -- ja --&gt; EN[Ollama:&lt;br/&gt;summary + tags]
+    ENR -- nein --&gt; EMB
+    EN --&gt; EMB[Embedding&lt;br/&gt;Qwen3, FP16]
+    EMB --&gt; UP[Upsert nach uri&lt;br/&gt;alte Chunks ersetzen]
+    UP --&gt; DB[(LanceDB&lt;br/&gt;documents)]</code></pre>
 <ol>
-<li><strong>Einlesen</strong> — alle unterstützten Dateien unter <code>SOURCE_DOCS_PATH/&lt;subdir&gt;</code>
-   werden eingelesen (PDF via <code>pypdf</code>, Text direkt).</li>
-<li><strong>Deduplizieren</strong> — über den SHA-256-Hash des Dateiinhalts; identische
-   Dateien werden übersprungen.</li>
+<li><strong>Extrahieren</strong> — PDF via <code>pypdf</code>, HTML via <code>trafilatura</code> (Fallback
+   BeautifulSoup), Text direkt.</li>
+<li><strong>Änderungserkennung</strong> — über den SHA-256-Hash des Inhalts (<code>content_hash</code>).
+   Unveränderte Quellen werden übersprungen; Dubletten gleichen Inhalts ebenso.</li>
 <li><strong>Chunking</strong> — wortbasiert mit <code>CHUNK_SIZE</code> und <code>CHUNK_OVERLAP</code>.</li>
-<li><strong>Embedding</strong> — Passages werden <strong>ohne</strong> Instruction-Prefix kodiert
-   (asymmetrisch, siehe <a href="../architektur/">Architektur</a>).</li>
-<li><strong>Schreiben</strong> — Tabelle wird (neu) angelegt und befüllt.</li>
+<li><strong>Anreicherung (optional)</strong> — lokaler LLM erzeugt Zusammenfassung + Auto-Tags.</li>
+<li><strong>Embedding</strong> — Passages <strong>ohne</strong> Instruction-Prefix (asymmetrisch, siehe
+   <a href="../architektur/">Architektur</a>).</li>
+<li><strong>Upsert</strong> — alle Chunks einer <code>uri</code> werden ersetzt (inkrementell, der
+   Link-Status in <code>links</code> bleibt unberührt).</li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Defensive Extraktion</p>
-<p>Eine fehlerhafte Datei bricht den Lauf nicht ab — sie wird geloggt und
-übersprungen (<code>skipped</code>).</p>
+<p>Eine fehlerhafte Datei oder URL bricht den Lauf nicht ab — sie wird geloggt
+und übersprungen.</p>
 </div>
-<h2 id="klassifizierung">Klassifizierung<a class="headerlink" href="#klassifizierung" title="Permanent link">&para;</a></h2>
-<p>Das Feld <code>type</code> wird aus dem Dateinamen abgeleitet:</p>
-<table>
-<thead>
-<tr>
-<th>Sammlung</th>
-<th>Werte für <code>type</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>standards</code></td>
-<td><code>iso</code>, <code>bsi</code>, <code>nist</code>, <code>sonstige</code></td>
-</tr>
-<tr>
-<td><code>risk_papers</code></td>
-<td><code>bayesian</code>, <code>quantitative</code>, <code>frameworks</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="lancedb-schema">LanceDB-Schema<a class="headerlink" href="#lancedb-schema" title="Permanent link">&para;</a></h2>
-<p>Beide Tabellen (<code>standards</code>, <code>risk_papers</code>) haben dieselben Felder:</p>
+<h2 id="felder-in-documents">Felder in <code>documents</code><a class="headerlink" href="#felder-in-documents" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -704,36 +731,44 @@ LanceDB. Pro Lauf wird die Zieltabelle neu gebaut.</p>
 <td><code>&lt;hash16&gt;_&lt;chunk-index&gt;</code></td>
 </tr>
 <tr>
-<td><code>title</code></td>
-<td>Dateiname ohne Endung</td>
+<td><code>source_type</code></td>
+<td><code>document</code> / <code>note</code> / <code>web</code> / <code>link</code></td>
 </tr>
 <tr>
-<td><code>source</code></td>
-<td>Dateiname</td>
+<td><code>collection</code></td>
+<td>Sammlung (z. B. aus Unterordner oder gesetzt)</td>
 </tr>
 <tr>
-<td><code>type</code></td>
-<td>Klassifizierung (siehe oben)</td>
+<td><code>tags</code></td>
+<td>Schlagworte (eigene + ggf. Auto-Tags)</td>
+</tr>
+<tr>
+<td><code>title</code>, <code>source</code>, <code>url</code></td>
+<td>Anzeige- und Herkunftsangaben</td>
 </tr>
 <tr>
 <td><code>content</code></td>
 <td>Chunk-Text</td>
 </tr>
 <tr>
-<td><code>file_path</code></td>
-<td>Pfad der Quelldatei</td>
+<td><code>summary</code></td>
+<td>KI-Zusammenfassung (nur mit <code>--enrich</code>)</td>
 </tr>
 <tr>
-<td><code>file_hash</code></td>
-<td>SHA-256 des Dateiinhalts</td>
+<td><code>uri</code></td>
+<td>stabile Quell-Kennung (Pfad/URL) — Upsert-Schlüssel</td>
 </tr>
 <tr>
-<td><code>chunk_index</code></td>
-<td>Position des Chunks im Dokument</td>
+<td><code>content_hash</code></td>
+<td>SHA-256 des Quellinhalts</td>
 </tr>
 <tr>
-<td><code>pages</code></td>
-<td>Seitenanzahl (PDF)</td>
+<td><code>chunk_index</code>, <code>n_chunks</code>, <code>pages</code></td>
+<td>Position/Umfang</td>
+</tr>
+<tr>
+<td><code>indexed_at</code></td>
+<td>Zeitstempel (für die Timeline)</td>
 </tr>
 <tr>
 <td><code>vector</code></td>
@@ -742,12 +777,12 @@ LanceDB. Pro Lauf wird die Zieltabelle neu gebaut.</p>
 </tbody>
 </table>
 <div class="admonition warning">
-<p class="admonition-title">Modellwechsel = neu indexieren</p>
-<p>Die Vektordimension stammt aus dem Modell (Qwen3-0.6B: 1024, optional per
-<code>EMBED_DIM</code> gekürzt). Wer Modell oder Dimension ändert, muss neu
-indexieren — sonst passen Query- und Passage-Vektoren nicht zusammen.</p>
+<p class="admonition-title">Schema-/Modellwechsel = neu indexieren</p>
+<p>Vektordimension stammt aus dem Modell (Qwen3-0.6B: 1024, optional per
+<code>EMBED_DIM</code> gekürzt). Modellwechsel, Dimensions- oder Schema-Änderung
+erfordern einen Neuaufbau der Tabelle.</p>
 </div>
-<p>Weiter mit dem <a href="../mcp-server/">MCP-Server</a>.</p>
+<p>Weiter mit der <a href="../links/">Linksammlung</a>.</p>
 
 
 

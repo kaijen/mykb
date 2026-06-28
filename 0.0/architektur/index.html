@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Selbst gehostete RAG-Pipeline für Information-Security- und Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.">
+        <meta name="description" content="Selbst gehosteter PKM-Speicher: Dokumente, Notizen, Web-Inhalte und eine Linksammlung, semantisch durchsuchbar über einen MCP-Server.">
       
       
         <meta name="author" content="Kai Jendrian">
@@ -27,7 +27,7 @@
     
     
       
-        <title>Architektur & Modelle - mykb — Literatur-RAG</title>
+        <title>Architektur & Modelle - mykb — persönlicher Wissensspeicher</title>
       
     
     
@@ -98,7 +98,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
-    <a href=".." title="mykb — Literatur-RAG" class="md-header__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-header__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            mykb — Literatur-RAG
+            mykb — persönlicher Wissensspeicher
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="mykb — Literatur-RAG" class="md-nav__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-nav__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    mykb — Literatur-RAG
+    mykb — persönlicher Wissensspeicher
   </label>
   
     <div class="md-nav__source">
@@ -320,14 +320,68 @@
   
   
     <li class="md-nav__item">
-      <a href="../indexierung/" class="md-nav__link">
+      <a href="../erfassen/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Indexierung
+    Inhalte erfassen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linksammlung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ki-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KI-Features
   
 
     
@@ -499,6 +553,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#paketstruktur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paketstruktur
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#datenmodell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datenmodell
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#modellwahl" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -588,6 +664,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#paketstruktur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paketstruktur
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#datenmodell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datenmodell
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#modellwahl" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -662,13 +760,58 @@
 ist der Engpass</strong>, nicht der RAM. Daraus folgt:</p>
 <ul>
 <li>Embedding und Reranking laufen auf der <strong>GPU</strong> (knappes Budget, FP16).</li>
-<li>LLM-Summaries (Ollama) laufen auf <strong>CPU/RAM</strong>, um nicht um VRAM zu
+<li>LLM-Anreicherung (Ollama) läuft auf <strong>CPU/RAM</strong>, um nicht um VRAM zu
   konkurrieren.</li>
-<li>Bei der Indexierung erst alle Embeddings (GPU), dann Summaries (CPU).</li>
+<li>Bei der Indexierung erst alle Embeddings (GPU), dann Anreicherung (CPU).</li>
 </ul>
+<h2 id="paketstruktur">Paketstruktur<a class="headerlink" href="#paketstruktur" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    CLI[__main__.py&lt;br/&gt;CLI] --&gt; ING[ingest.py]
+    CLI --&gt; LNK[links.py]
+    CLI --&gt; COL[collections.py]
+    ING --&gt; EX[extract.py]
+    ING --&gt; EMB[embedder.py]
+    ING --&gt; ENR[enrich.py]
+    ING --&gt; ST[store.py]
+    LNK --&gt; ING
+    LNK --&gt; WEB[web.py]
+    SRV[server/server.py] --&gt; EMB
+    SRV --&gt; ST
+    SRV --&gt; PAT[patterns.py]
+    ST --&gt; SC[schema.py]
+    ST --&gt; DB[(LanceDB)]</code></pre>
+<p>Geteilte Logik liegt im Paket <code>mykb/</code>; <code>server/</code> und die CLI sind dünn. Der
+Embedder wird von <strong>Ingestion und Server</strong> gemeinsam genutzt — so bleibt das
+asymmetrische Embedding garantiert konsistent.</p>
+<h2 id="datenmodell">Datenmodell<a class="headerlink" href="#datenmodell" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>erDiagram
+    documents {
+        string id PK
+        string source_type "document|note|web|link"
+        string collection
+        list   tags
+        string title
+        string url
+        string content "Chunk-Text"
+        string summary "optional (Ollama)"
+        string uri "Upsert-Schlüssel"
+        string content_hash
+        int    chunk_index
+        string indexed_at
+        vector vector
+    }
+    links {
+        string id PK
+        string url
+        string title
+        list   tags
+        string status "ok|broken|timeout|error|unchecked"
+        int    http_status
+        string last_checked
+        string content_hash
+    }
+    links ||--o{ documents : "Snapshot (source_type=link, je url)"</code></pre>
 <h2 id="modellwahl">Modellwahl<a class="headerlink" href="#modellwahl" title="Permanent link">&para;</a></h2>
-<p>Im Consulting-Kontext zählt die <strong>kommerzielle Lizenzierbarkeit</strong>. Daher
-ausschließlich Apache-2.0-Modelle:</p>
 <table>
 <thead>
 <tr>
@@ -701,23 +844,33 @@ ausschließlich Apache-2.0-Modelle:</p>
 <td>~0,6 GB</td>
 <td>kommerziell nutzbar, multilingual</td>
 </tr>
+<tr>
+<td>Anreicherung</td>
+<td>lokal via Ollama (z. B. <code>llama3.2</code>)</td>
+<td>je Modell</td>
+<td>CPU/RAM</td>
+<td>Zusammenfassung + Auto-Tags</td>
+</tr>
 </tbody>
 </table>
-<div class="admonition warning">
-<p class="admonition-title">Bewusst nicht verwendet</p>
-<p><code>jinaai/jina-reranker-v2-base-multilingual</code> (cc-by-nc-4.0,
-non-commercial) und <code>all-MiniLM-L6-v2</code> (nur Englisch).</p>
+<div class="admonition note">
+<p class="admonition-title">Lizenzpolitik (gelockert)</p>
+<p>Für selbst gehostete <strong>Tooling-Bibliotheken</strong> sind auch Copyleft-Lizenzen
+(z. B. trafilatura, GPLv3) in Ordnung. Bei <strong>Modellen</strong>, die in bezahlter
+Beratung Ergebnisse liefern, bleibt eine kommerziell nutzbare Lizenz die
+Voreinstellung; ein non-commercial Modell wie der Jina-Reranker (cc-by-nc)
+ist nur als optionale Alternative für rein private Nutzung gedacht.</p>
 </div>
 <h2 id="asymmetrisches-embedding">Asymmetrisches Embedding<a class="headerlink" href="#asymmetrisches-embedding" title="Permanent link">&para;</a></h2>
 <p>Qwen3 ist <strong>asymmetrisch</strong>: <em>Queries</em> bekommen einen Instruction-Prefix,
 <em>Passages</em> nicht.</p>
 <ul>
-<li>Beim <strong>Indexieren</strong> (<code>Embedder.encode_passages</code>) werden Dokumente ohne Prefix
+<li>Beim <strong>Indexieren</strong> (<code>Embedder.encode_passages</code>) werden Inhalte ohne Prefix
   kodiert.</li>
-<li>Beim <strong>Suchen</strong> (<code>server/server.py</code>) wird der Prefix gespiegelt:</li>
+<li>Beim <strong>Suchen</strong> (<code>Embedder.encode_query</code>) wird der Prefix gespiegelt:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Instruct: Given a search query, retrieve relevant passages from
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>information security standards and risk management literature
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Instruct: Given a search query, retrieve relevant passages from a personal
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>knowledge base of documents, notes and saved web content
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Query: &lt;die eigentliche Anfrage&gt;
 </code></pre></div>
 <p>Beide Seiten nutzen dasselbe Modell und dieselbe (ggf. per <code>EMBED_DIM</code>
@@ -740,20 +893,24 @@ gekürzte) Dimension — sonst sind die Vektoren nicht vergleichbar.</p>
 <td>sentence-transformers + Qwen3</td>
 </tr>
 <tr>
+<td>Web-Extraktion</td>
+<td>httpx + trafilatura (Fallback BeautifulSoup)</td>
+</tr>
+<tr>
+<td>Anreicherung</td>
+<td>Ollama (lokaler LLM, CPU)</td>
+</tr>
+<tr>
+<td>Bookmarks</td>
+<td>Linkwarden (API-Connector)</td>
+</tr>
+<tr>
 <td>MCP-Server</td>
 <td>FastMCP (Python), SSE-Transport</td>
 </tr>
 <tr>
 <td>Container</td>
-<td>Docker Compose</td>
-</tr>
-<tr>
-<td>Reverse Proxy</td>
-<td>Traefik (ACME/Let's Encrypt)</td>
-</tr>
-<tr>
-<td>Auth</td>
-<td>Authelia (Forward-Auth, 2FA)</td>
+<td>Docker Compose · Traefik · Authelia</td>
 </tr>
 <tr>
 <td>Logging</td>
@@ -763,11 +920,10 @@ gekürzte) Dimension — sonst sind die Vektoren nicht vergleichbar.</p>
 </table>
 <h2 id="offene-punkte">Offene Punkte<a class="headerlink" href="#offene-punkte" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Reranking</strong> produktiv schalten (Top-20 → Top-5 mit gte-reranker).</li>
-<li><strong>Hybrid-Retrieval</strong> prüfen: BGE-M3 (dense + sparse) für exakte Fachbegriffe
-   wie „ISO 27001 Annex A.8".</li>
-<li><strong>Deploy</strong> mit Traefik + Authelia produktiv härten.</li>
-<li><strong>Inkrementelles Indexieren</strong>: statt Neuaufbau Upsert über <code>file_hash</code>.</li>
+<li><strong>Reranking</strong> produktiv schalten (Top-K → Top-N mit gte-reranker).</li>
+<li><strong>Hybrid-Retrieval</strong> prüfen: BGE-M3 (dense + sparse) für exakte Fachbegriffe.</li>
+<li><strong>VPS-Sync</strong> festlegen (rsync vs. S3) und automatisieren.</li>
+<li><strong>Breitere Capture-Quellen</strong> (Readwise, YouTube-Transkripte, OCR).</li>
 </ol>
 <p>Details und Begründungen stehen in der <code>CLAUDE.md</code> im Repository.</p>
 

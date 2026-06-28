@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Selbst gehostete RAG-Pipeline für Information-Security- und Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.">
+        <meta name="description" content="Selbst gehosteter PKM-Speicher: Dokumente, Notizen, Web-Inhalte und eine Linksammlung, semantisch durchsuchbar über einen MCP-Server.">
       
       
         <meta name="author" content="Kai Jendrian">
@@ -27,7 +27,7 @@
     
     
       
-        <title>mykb — Literatur-RAG</title>
+        <title>mykb — persönlicher Wissensspeicher</title>
       
     
     
@@ -98,7 +98,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
-    <a href="." title="mykb — Literatur-RAG" class="md-header__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href="." title="mykb — persönlicher Wissensspeicher" class="md-header__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            mykb — Literatur-RAG
+            mykb — persönlicher Wissensspeicher
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="mykb — Literatur-RAG" class="md-nav__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href="." title="mykb — persönlicher Wissensspeicher" class="md-nav__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    mykb — Literatur-RAG
+    mykb — persönlicher Wissensspeicher
   </label>
   
     <div class="md-nav__source">
@@ -326,10 +326,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#wie-es-funktioniert" class="md-nav__link">
+  <a href="#vier-quelltypen-ein-index" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Wie es funktioniert
+        Vier Quelltypen, ein Index
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architektur-auf-einen-blick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architektur auf einen Blick
       
     </span>
   </a>
@@ -400,14 +411,68 @@
   
   
     <li class="md-nav__item">
-      <a href="indexierung/" class="md-nav__link">
+      <a href="erfassen/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Indexierung
+    Inhalte erfassen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linksammlung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ki-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KI-Features
   
 
     
@@ -555,10 +620,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#wie-es-funktioniert" class="md-nav__link">
+  <a href="#vier-quelltypen-ein-index" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Wie es funktioniert
+        Vier Quelltypen, ein Index
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architektur-auf-einen-blick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architektur auf einen Blick
       
     </span>
   </a>
@@ -613,58 +689,63 @@
 
 
 <h1 id="uberblick">Überblick<a class="headerlink" href="#uberblick" title="Permanent link">&para;</a></h1>
-<p><strong>mykb</strong> ist eine selbst gehostete <strong>RAG-Pipeline</strong> (Retrieval-Augmented
-Generation) für eine persönliche Fach-Literatursammlung aus den Bereichen
-<strong>Information Security</strong> und <strong>Risikomanagement</strong>.</p>
-<p>Die Sammlung wird mit semantischen Embeddings in <strong>LanceDB</strong> indexiert und über
-einen <strong>MCP-Server</strong> direkt aus Claude (VSCode, Claude Desktop) durchsuchbar
-gemacht — semantische Treffer statt Volltext-Grep, sprachübergreifend zwischen
-Deutsch und Englisch.</p>
+<p><strong>mykb</strong> ist ein selbst gehosteter, persönlicher Wissensspeicher (Personal
+Knowledge Management). Eigene <strong>Dokumente</strong>, <strong>Notizen</strong>, <strong>Web-Inhalte</strong> und
+eine <strong>Linksammlung</strong> werden mit semantischen Embeddings in <strong>LanceDB</strong>
+indexiert und über einen <strong>MCP-Server</strong> im Alltag aus Claude (VSCode, Claude
+Desktop) nutzbar gemacht — semantische Treffer statt Volltext-Grep,
+sprachübergreifend zwischen Deutsch und Englisch.</p>
 <div class="admonition info">
-<p class="admonition-title">Kontext</p>
-<p>Einsatz im Consulting-Kontext. Daher gilt: alle eingesetzten Modelle sind
-<strong>kommerziell lizenzierbar</strong> (Apache 2.0), der Stack läuft <strong>lokal ohne
-Cloud</strong>, und vertrauliche Dokumente bleiben lokal (siehe
-<a href="deployment/">Deployment</a>).</p>
+<p class="admonition-title">Leitlinien</p>
+<p>Stack <strong>lokal ohne Cloud</strong> (LanceDB ist serverless, dateibasiert). Modelle
+bevorzugt <strong>kommerziell lizenzierbar</strong> (Apache 2.0); Tooling darf auch
+Copyleft sein (Eigenbetrieb). Bookmarks kommen aus <strong>Linkwarden</strong>, der
+KI-Layer im Alltag ist <strong>Claude über MCP</strong>.</p>
 </div>
-<h2 id="wie-es-funktioniert">Wie es funktioniert<a class="headerlink" href="#wie-es-funktioniert" title="Permanent link">&para;</a></h2>
-<p>Standards (ISO, BSI, NIST) und Risikomanagement-Literatur liegen als PDF-,
-Markdown- oder Textdateien vor. Die Pipeline</p>
-<ol>
-<li><strong>extrahiert</strong> den Text, zerlegt ihn in überlappende Chunks und
-   <strong>dedupliziert</strong> über einen SHA-256-Hash des Dateiinhalts,</li>
-<li><strong>kodiert</strong> jeden Chunk mit <code>Qwen3-Embedding-0.6B</code> (DE + EN nativ) zu einem
-   Vektor,</li>
-<li><strong>speichert</strong> Vektoren samt Metadaten in zwei LanceDB-Tabellen
-   (<code>standards</code>, <code>risk_papers</code>),</li>
-<li><strong>stellt</strong> die Suche über einen MCP-Server bereit, den Claude als Werkzeug
-   nutzt.</li>
-</ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Quelldokumente (PDF/MD/TXT)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>        │
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        ▼
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>scripts/index_literature.py   ──►  LanceDB (data/lance)
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>   Qwen3-Embedding (GPU, FP16)        Tabellen: standards, risk_papers
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        │
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        ▼
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>server/server.py (FastMCP, SSE)  ◄── Claude (MCP-Client)
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>   Query-Embedding (asymmetrisch) + optionales Reranking
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        │
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        ▼
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>deploy/  Traefik (TLS) + Authelia (2FA)  für Remote-Betrieb
-</code></pre></div>
+<h2 id="vier-quelltypen-ein-index">Vier Quelltypen, ein Index<a class="headerlink" href="#vier-quelltypen-ein-index" title="Permanent link">&para;</a></h2>
+<p>Alles landet in der Tabelle <code>documents</code> (Feld <code>source_type</code>) und ist damit
+einheitlich durchsuchbar:</p>
+<ul>
+<li><strong>document</strong> — lokale Dateien (PDF, Markdown, Text)</li>
+<li><strong>note</strong> — eigene Notizen (Markdown, Zettelkasten/Obsidian-Stil)</li>
+<li><strong>web</strong> — abgerufene Web-Seiten (HTML → Text)</li>
+<li><strong>link</strong> — Bookmarks mit Snapshot des Seiteninhalts (aus Linkwarden)</li>
+</ul>
+<h2 id="architektur-auf-einen-blick">Architektur auf einen Blick<a class="headerlink" href="#architektur-auf-einen-blick" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    subgraph Quellen
+        D[Dokumente&lt;br/&gt;PDF/MD/TXT]
+        N[Notizen&lt;br/&gt;Markdown]
+        W[Web-Seiten]
+        LW[Linkwarden&lt;br/&gt;Bookmarks + Archiv]
+    end
+
+    D --&gt; ING[Ingest&lt;br/&gt;extrahieren · chunken · embedden]
+    N --&gt; ING
+    W --&gt; ING
+    LW --&gt;|API-Sync| ING
+
+    ING --&gt; DB[(LanceDB&lt;br/&gt;documents · links)]
+    OLL[Ollama&lt;br/&gt;Anreicherung, CPU] -.optional.-&gt; ING
+
+    DB --&gt; SRV[MCP-Server&lt;br/&gt;FastMCP · SSE]
+    SRV &lt;--&gt;|Tools + Prompts| CL[Claude&lt;br/&gt;VSCode · Desktop]
+
+    classDef store fill:#e8eaf6,stroke:#3f51b5;
+    class DB store;</code></pre>
 <h2 id="warum-semantische-suche">Warum semantische Suche?<a class="headerlink" href="#warum-semantische-suche" title="Permanent link">&para;</a></h2>
-<p>Eine klassische Stichwortsuche findet „ISO 27001 Annex A.8" nur, wenn genau
-diese Zeichenkette im Text steht. Die Embedding-Suche findet auch Passagen, die
-dasselbe Konzept mit anderen Worten beschreiben (z. B. „Asset Management" oder
-„Inventarisierung von Werten") — und das sprachübergreifend.</p>
+<p>Eine Stichwortsuche findet „ISO 27001 Annex A.8" nur bei exakter Zeichenkette.
+Die Embedding-Suche findet auch Passagen, die dasselbe Konzept anders benennen
+(z. B. „Asset Management" oder „Inventarisierung von Werten") — sprachübergreifend.</p>
 <h2 id="nachste-schritte">Nächste Schritte<a class="headerlink" href="#nachste-schritte" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="installation/">Installation</a> — Umgebung einrichten</li>
-<li><a href="indexierung/">Indexierung</a> — Dokumente in LanceDB überführen</li>
+<li><a href="erfassen/">Inhalte erfassen</a> — Dokumente, Notizen, Web indexieren</li>
+<li><a href="links/">Linksammlung</a> — Linkwarden anbinden, Link-Rot prüfen</li>
+<li><a href="ki-features/">KI-Features</a> — Anreicherung, Patterns, Auto-Sammlungen</li>
 <li><a href="mcp-server/">MCP-Server</a> — Suche in Claude einbinden</li>
 <li><a href="konfiguration/">Konfiguration</a> — Environment-Variablen</li>
-<li><a href="deployment/">Deployment</a> — Remote-Betrieb mit TLS und 2FA</li>
+<li><a href="deployment/">Deployment</a> — Erstellen (Laptop) vs. Abfragen (VPS)</li>
 <li><a href="architektur/">Architektur &amp; Modelle</a> — Modellwahl und Hintergründe</li>
 </ul>
 

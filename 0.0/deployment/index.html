@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Selbst gehostete RAG-Pipeline für Information-Security- und Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.">
+        <meta name="description" content="Selbst gehosteter PKM-Speicher: Dokumente, Notizen, Web-Inhalte und eine Linksammlung, semantisch durchsuchbar über einen MCP-Server.">
       
       
         <meta name="author" content="Kai Jendrian">
@@ -29,7 +29,7 @@
     
     
       
-        <title>Deployment - mykb — Literatur-RAG</title>
+        <title>Deployment - mykb — persönlicher Wissensspeicher</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
-    <a href=".." title="mykb — Literatur-RAG" class="md-header__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-header__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            mykb — Literatur-RAG
+            mykb — persönlicher Wissensspeicher
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -238,13 +238,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="mykb — Literatur-RAG" class="md-nav__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-nav__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    mykb — Literatur-RAG
+    mykb — persönlicher Wissensspeicher
   </label>
   
     <div class="md-nav__source">
@@ -322,14 +322,68 @@
   
   
     <li class="md-nav__item">
-      <a href="../indexierung/" class="md-nav__link">
+      <a href="../erfassen/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Indexierung
+    Inhalte erfassen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linksammlung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ki-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KI-Features
   
 
     
@@ -496,10 +550,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gpu-im-container" class="md-nav__link">
+  <a href="#sync-noch-offen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GPU im Container
+        Sync (noch offen)
       
     </span>
   </a>
@@ -507,10 +561,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spatere-migration-auf-einen-vps" class="md-nav__link">
+  <a href="#gpu-im-container" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Spätere Migration auf einen VPS
+        GPU im Container
       
     </span>
   </a>
@@ -612,10 +666,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gpu-im-container" class="md-nav__link">
+  <a href="#sync-noch-offen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GPU im Container
+        Sync (noch offen)
       
     </span>
   </a>
@@ -623,10 +677,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spatere-migration-auf-einen-vps" class="md-nav__link">
+  <a href="#gpu-im-container" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Spätere Migration auf einen VPS
+        GPU im Container
       
     </span>
   </a>
@@ -659,16 +713,31 @@
 
 
 <h1 id="deployment">Deployment<a class="headerlink" href="#deployment" title="Permanent link">&para;</a></h1>
-<p>Für den Remote-Betrieb läuft der MCP-Server hinter <strong>Traefik</strong> (TLS/ACME) und
-<strong>Authelia</strong> (Forward-Auth, 2FA). Das Verzeichnis <code>deploy/</code> enthält ein
-kommentiertes <strong>Gerüst</strong>, das vor dem Produktivbetrieb anzupassen ist.</p>
+<p>mykb trennt bewusst zwei Seiten: <strong>Erstellen</strong> (Laptop, GPU) und <strong>Abfragen</strong>
+(VPS, CPU). Beide nutzen denselben asymmetrischen Embedder.</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph Laptop [Erstellen · Laptop · GPU]
+        ING[index / web / links]
+        EMB[Qwen3-Embedding FP16]
+        ENR[Ollama-Anreicherung]
+        ING --&gt; EMB
+        ENR -.-&gt; ING
+    end
+    DB[(LanceDB&lt;br/&gt;documents · links)]
+    EMB --&gt; DB
+    DB ==&gt;|Sync: rsync / S3&lt;br/&gt;noch offen| DBV[(LanceDB-Kopie)]
+    subgraph VPS [Abfragen · VPS · CPU]
+        TR[Traefik TLS] --&gt; AU[Authelia 2FA] --&gt; SRV[MCP-Server]
+        DBV --&gt; SRV
+    end
+    CL[Claude] &lt;--&gt;|SSE| TR</code></pre>
 <div class="admonition danger">
-<p class="admonition-title">Vertrauliche Dokumente</p>
-<p>Öffentliche Standards und eigene Analysen sind unkritisch.
-<strong>Client-spezifische oder vertrauliche Dokumente gehören nicht auf einen
-externen VPS</strong>, sondern bleiben lokal oder in einer isolierten,
-NDA-konformen Instanz. Im Remote-Betrieb gilt: TLS erzwingen, 2FA, Rate
-Limiting, Logging.</p>
+<p class="admonition-title">Alle Daten landen auf dem VPS</p>
+<p>Entscheidung: der gesamte Speicher wird synchronisiert — also können auch
+<strong>private/vertrauliche Inhalte</strong> remote liegen. Die Absicherung ist daher
+<strong>Pflicht</strong>: TLS erzwingen, Authelia 2FA, Rate Limiting, Logging. Streng
+vertrauliche (z. B. NDA-gebundene) Dokumente im Zweifel in einer getrennten,
+lokalen Instanz halten.</p>
 </div>
 <h2 id="inhalt-von-deploy">Inhalt von <code>deploy/</code><a class="headerlink" href="#inhalt-von-deploy" title="Permanent link">&para;</a></h2>
 <table>
@@ -681,7 +750,7 @@ Limiting, Logging.</p>
 <tbody>
 <tr>
 <td><code>Dockerfile</code></td>
-<td>Image für Indexer + MCP-Server</td>
+<td>Image für Ingest + MCP-Server</td>
 </tr>
 <tr>
 <td><code>docker-compose.yml</code></td>
@@ -701,7 +770,7 @@ Limiting, Logging.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>deploy
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># 1. Domain und ACME-E-Mail setzen</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DOMAIN</span><span class="o">=</span>rag.example.com<span class="w"> </span><span class="nv">ACME_EMAIL</span><span class="o">=</span>admin@example.com
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DOMAIN</span><span class="o">=</span>mykb.example.com<span class="w"> </span><span class="nv">ACME_EMAIL</span><span class="o">=</span>admin@example.com
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># 2. Authelia konfigurieren (Secrets NICHT ins Repo)</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>cp<span class="w"> </span>authelia/configuration.example.yml<span class="w">   </span>authelia/configuration.yml
@@ -711,8 +780,8 @@ Limiting, Logging.</p>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># 3. Bauen und starten</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># 4. Index befüllen (einmalig / nach Dokumentänderungen)</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>mcp<span class="w"> </span>python<span class="w"> </span>scripts/index_literature.py<span class="w"> </span>--target<span class="w"> </span>all
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># 4. Index befüllen (einmalig / nach Änderungen)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>mcp<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>index<span class="w"> </span>--source<span class="w"> </span>all
 </code></pre></div>
 <h2 id="sicherheitsmerkmale">Sicherheitsmerkmale<a class="headerlink" href="#sicherheitsmerkmale" title="Permanent link">&para;</a></h2>
 <ul>
@@ -723,13 +792,15 @@ Limiting, Logging.</p>
 <li><strong>Rate Limiting</strong> — Authelia-<code>regulation</code> gegen Brute-Force.</li>
 <li><strong>Secrets</strong> — über Docker Secrets / Environment, nie im Repo.</li>
 </ul>
+<h2 id="sync-noch-offen">Sync (noch offen)<a class="headerlink" href="#sync-noch-offen" title="Permanent link">&para;</a></h2>
+<p>LanceDB sind nur Dateien. Der Transport Laptop → VPS ist bewusst noch nicht
+festgelegt — Optionen: <code>rsync</code> über SSH oder Object Storage (S3/MinIO), aus dem
+der VPS direkt liest. Die Konfiguration ist über Environment-Variablen bereits
+entkoppelt (siehe <a href="../konfiguration/">Konfiguration</a>).</p>
 <h2 id="gpu-im-container">GPU im Container<a class="headerlink" href="#gpu-im-container" title="Permanent link">&para;</a></h2>
-<p>Das Default-Image ist CPU-only. Für GPU-Betrieb ein CUDA-Basisimage wählen, das
-nvidia-Runtime im Compose aktivieren und <code>EMBED_DEVICE=cuda</code> setzen.</p>
-<h2 id="spatere-migration-auf-einen-vps">Spätere Migration auf einen VPS<a class="headerlink" href="#spatere-migration-auf-einen-vps" title="Permanent link">&para;</a></h2>
-<p>Ein Umzug auf einen VPS ist vorgesehen — dann ggf. CPU-only-Inferenz mit
-kleineren Modellen. Die Konfiguration ist dafür bereits über Environment-
-Variablen entkoppelt (siehe <a href="../konfiguration/">Konfiguration</a>).</p>
+<p>Das Default-Image ist CPU-only (passt zur VPS-Abfrageseite). Für GPU-Ingest ein
+CUDA-Basisimage wählen, das nvidia-Runtime im Compose aktivieren und
+<code>EMBED_DEVICE=cuda</code> setzen.</p>
 
 
 

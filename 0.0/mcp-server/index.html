@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Selbst gehostete RAG-Pipeline für Information-Security- und Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.">
+        <meta name="description" content="Selbst gehosteter PKM-Speicher: Dokumente, Notizen, Web-Inhalte und eine Linksammlung, semantisch durchsuchbar über einen MCP-Server.">
       
       
         <meta name="author" content="Kai Jendrian">
@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://kaijen.github.io/mykb/0.0/mcp-server/">
       
       
-        <link rel="prev" href="../indexierung/">
+        <link rel="prev" href="../ki-features/">
       
       
         <link rel="next" href="../konfiguration/">
@@ -29,7 +29,7 @@
     
     
       
-        <title>MCP-Server - mykb — Literatur-RAG</title>
+        <title>MCP-Server - mykb — persönlicher Wissensspeicher</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
-    <a href=".." title="mykb — Literatur-RAG" class="md-header__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-header__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            mykb — Literatur-RAG
+            mykb — persönlicher Wissensspeicher
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -238,13 +238,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="mykb — Literatur-RAG" class="md-nav__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-nav__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    mykb — Literatur-RAG
+    mykb — persönlicher Wissensspeicher
   </label>
   
     <div class="md-nav__source">
@@ -322,14 +322,68 @@
   
   
     <li class="md-nav__item">
-      <a href="../indexierung/" class="md-nav__link">
+      <a href="../erfassen/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Indexierung
+    Inhalte erfassen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linksammlung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ki-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KI-Features
   
 
     
@@ -439,44 +493,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#search_standardsquery-limit" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompts-patterns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        search_standards(query, limit?)
+        Prompts (Patterns)
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#search_risk_managementquery-limit" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        search_risk_management(query, limit?)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_document_contextfile_hash-chunk_index-window-table" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_document_context(file_hash, chunk_index, window?, table?)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -648,44 +674,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#search_standardsquery-limit" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompts-patterns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        search_standards(query, limit?)
+        Prompts (Patterns)
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#search_risk_managementquery-limit" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        search_risk_management(query, limit?)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_document_contextfile_hash-chunk_index-window-table" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_document_context(file_hash, chunk_index, window?, table?)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -737,9 +735,9 @@
 
 
 <h1 id="mcp-server">MCP-Server<a class="headerlink" href="#mcp-server" title="Permanent link">&para;</a></h1>
-<p><code>server/server.py</code> stellt den LanceDB-Index als <strong>MCP-Server</strong> (FastMCP,
-SSE-Transport) bereit. Claude bindet ihn als Werkzeug ein und kann die Sammlung
-semantisch durchsuchen.</p>
+<p><code>server/server.py</code> stellt den LanceDB-Wissensspeicher als <strong>MCP-Server</strong>
+(FastMCP, SSE-Transport) bereit. Claude bindet ihn als Werkzeug ein und kann
+den Speicher semantisch durchsuchen, Verwandtes finden und Patterns anwenden.</p>
 <h2 id="starten">Starten<a class="headerlink" href="#starten" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>server/server.py
 </code></pre></div>
@@ -750,7 +748,7 @@ den SSE-Endpoint unter <code>/sse</code> an.</p>
 einen SSE-Server eintragen:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;literatur-rag&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;mykb&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://localhost:8000/sse&quot;</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="p">}</span>
@@ -759,38 +757,68 @@ einen SSE-Server eintragen:</p>
 <p>Im Remote-Betrieb steht statt <code>localhost</code> die über Traefik veröffentlichte
 Domain (mit TLS und Authelia davor, siehe <a href="../deployment/">Deployment</a>).</p>
 <h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
-<h3 id="search_standardsquery-limit"><code>search_standards(query, limit?)</code><a class="headerlink" href="#search_standardsquery-limit" title="Permanent link">&para;</a></h3>
-<p>Semantische Suche in den Information-Security-Standards (ISO, BSI, NIST).</p>
-<ul>
-<li><code>query</code> — Suchanfrage in natürlicher Sprache (DE oder EN)</li>
-<li><code>limit</code> — Anzahl Treffer (Default aus <code>SEARCH_RETURN_K</code>)</li>
-</ul>
-<h3 id="search_risk_managementquery-limit"><code>search_risk_management(query, limit?)</code><a class="headerlink" href="#search_risk_managementquery-limit" title="Permanent link">&para;</a></h3>
-<p>Semantische Suche in der Risikomanagement-Literatur. Gleiche Parameter.</p>
-<h3 id="get_document_contextfile_hash-chunk_index-window-table"><code>get_document_context(file_hash, chunk_index, window?, table?)</code><a class="headerlink" href="#get_document_contextfile_hash-chunk_index-window-table" title="Permanent link">&para;</a></h3>
-<p>Holt die benachbarten Chunks eines Dokuments für mehr Kontext um eine
-Fundstelle.</p>
-<ul>
-<li><code>file_hash</code> — SHA-256 aus einem Suchtreffer</li>
-<li><code>chunk_index</code> — mittlerer Chunk</li>
-<li><code>window</code> — Anzahl Chunks davor und danach (Default 2)</li>
-<li><code>table</code> — <code>standards</code> oder <code>risk_papers</code></li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Zweck</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>search_knowledge(query, source_types?, collection?, limit?)</code></td>
+<td>semantische Suche über alle Quelltypen, optional gefiltert</td>
+</tr>
+<tr>
+<td><code>find_links(query, only_alive?, limit?)</code></td>
+<td>Link-Snapshots durchsuchen + Bookmark-Status</td>
+</tr>
+<tr>
+<td><code>find_related(uri, limit?)</code></td>
+<td>semantisch verwandte Inhalte zu einem Element</td>
+</tr>
+<tr>
+<td><code>recent_items(limit?, source_types?)</code></td>
+<td>zuletzt hinzugefügte Elemente (Timeline)</td>
+</tr>
+<tr>
+<td><code>get_document_context(uri, chunk_index, window?)</code></td>
+<td>benachbarte Chunks einer Fundstelle</td>
+</tr>
+</tbody>
+</table>
+<h2 id="prompts-patterns">Prompts (Patterns)<a class="headerlink" href="#prompts-patterns" title="Permanent link">&para;</a></h2>
+<p>Zusätzlich stehen kuratierte Analyse-Prompts bereit, anwendbar auf eine <code>uri</code>:
+<code>summarize</code>, <code>extract_wisdom</code>, <code>extract_claims</code>, <code>action_items</code> — Details unter
+<a href="../ki-features/">KI-Features</a>.</p>
 <h2 id="wie-die-suche-ablauft">Wie die Suche abläuft<a class="headerlink" href="#wie-die-suche-ablauft" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant C as Claude
+    participant S as MCP-Server
+    participant E as Embedder (Qwen3)
+    participant DB as LanceDB
+    C-&gt;&gt;S: search_knowledge(query, ...)
+    S-&gt;&gt;E: Query-Embedding (Instruction-Prefix)
+    E--&gt;&gt;S: Vektor
+    S-&gt;&gt;DB: Vektorsuche Top-K (+ Filter)
+    DB--&gt;&gt;S: Kandidaten
+    opt RERANK_MODEL gesetzt
+        S-&gt;&gt;S: Cross-Encoder sortiert um
+    end
+    S--&gt;&gt;C: Top-N Treffer (ohne Vektor)</code></pre>
 <ol>
-<li>Das <strong>Query-Embedding</strong> wird mit dem Qwen3-Instruction-Prefix erzeugt
-   (asymmetrisch, gespiegelt aus dem Indexer — siehe
-   <a href="../architektur/">Architektur</a>).</li>
-<li>LanceDB liefert die Top-<code>SEARCH_TOP_K</code> Kandidaten per Vektorsuche.</li>
-<li><strong>Optional:</strong> Ist <code>RERANK_MODEL</code> gesetzt, sortiert ein Cross-Encoder die
-   Kandidaten um (defensiv: schlägt das Laden fehl, läuft die Suche ohne
-   Reranking weiter).</li>
-<li>Die Top-<code>SEARCH_RETURN_K</code> Treffer werden zurückgegeben — ohne den Vektor.</li>
+<li><strong>Query-Embedding</strong> mit Qwen3-Instruction-Prefix (asymmetrisch, gespiegelt
+   aus der Ingestion — siehe <a href="../architektur/">Architektur</a>).</li>
+<li>LanceDB liefert die Top-<code>SEARCH_TOP_K</code> Kandidaten, optional mit Filter
+   (Quelltyp/Sammlung).</li>
+<li><strong>Optional:</strong> Ist <code>RERANK_MODEL</code> gesetzt, sortiert ein Cross-Encoder um
+   (defensiv: schlägt das Laden fehl, läuft die Suche ohne Reranking weiter).</li>
+<li>Die Top-<code>SEARCH_RETURN_K</code> Treffer gehen zurück — ohne den Vektor.</li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Performance</p>
-<p>Die Modelle werden erst beim ersten Tool-Aufruf geladen (langer Start,
-knappes VRAM-Budget) und danach zwischengespeichert.</p>
+<p>Modelle werden erst beim ersten Tool-Aufruf geladen (langer Start, knappes
+VRAM-Budget) und danach zwischengespeichert.</p>
 </div>
 <h2 id="datenschutz-im-log">Datenschutz im Log<a class="headerlink" href="#datenschutz-im-log" title="Permanent link">&para;</a></h2>
 <p>Queries werden nur <strong>gekürzt</strong> geloggt (Vorschau), niemals als Klartext. Logs

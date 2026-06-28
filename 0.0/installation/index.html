@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Selbst gehostete RAG-Pipeline für Information-Security- und Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.">
+        <meta name="description" content="Selbst gehosteter PKM-Speicher: Dokumente, Notizen, Web-Inhalte und eine Linksammlung, semantisch durchsuchbar über einen MCP-Server.">
       
       
         <meta name="author" content="Kai Jendrian">
@@ -18,7 +18,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../indexierung/">
+        <link rel="next" href="../erfassen/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Installation - mykb — Literatur-RAG</title>
+        <title>Installation - mykb — persönlicher Wissensspeicher</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Kopfzeile">
-    <a href=".." title="mykb — Literatur-RAG" class="md-header__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-header__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            mykb — Literatur-RAG
+            mykb — persönlicher Wissensspeicher
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -238,13 +238,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="mykb — Literatur-RAG" class="md-nav__button md-logo" aria-label="mykb — Literatur-RAG" data-md-component="logo">
+    <a href=".." title="mykb — persönlicher Wissensspeicher" class="md-nav__button md-logo" aria-label="mykb — persönlicher Wissensspeicher" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    mykb — Literatur-RAG
+    mykb — persönlicher Wissensspeicher
   </label>
   
     <div class="md-nav__source">
@@ -388,10 +388,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quelldokumente-ablegen" class="md-nav__link">
+  <a href="#quellen-ablegen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quelldokumente ablegen
+        Quellen ablegen
       
     </span>
   </a>
@@ -424,14 +424,68 @@
   
   
     <li class="md-nav__item">
-      <a href="../indexierung/" class="md-nav__link">
+      <a href="../erfassen/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Indexierung
+    Inhalte erfassen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linksammlung
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ki-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KI-Features
   
 
     
@@ -612,10 +666,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quelldokumente-ablegen" class="md-nav__link">
+  <a href="#quellen-ablegen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quelldokumente ablegen
+        Quellen ablegen
       
     </span>
   </a>
@@ -665,6 +719,9 @@
 <li>Für GPU-Betrieb: CUDA-fähige GPU. Das Referenz-Setup nutzt eine GPU mit
   <strong>4 GB VRAM</strong> (Engpass) und <strong>64 GB System-RAM</strong>. CPU-only ist möglich
   (langsamer, siehe <a href="../konfiguration/">Konfiguration</a>).</li>
+<li>Optional: <strong>Ollama</strong> für die KI-Anreicherung (läuft auf CPU, siehe
+  <a href="../ki-features/">KI-Features</a>).</li>
+<li>Optional: <strong>Linkwarden</strong> als Bookmark-Frontend (siehe <a href="../links/">Linksammlung</a>).</li>
 <li>Optional für den Remote-Betrieb: Docker und Docker Compose.</li>
 </ul>
 <h2 id="einrichtung">Einrichtung<a class="headerlink" href="#einrichtung" title="Permanent link">&para;</a></h2>
@@ -684,27 +741,31 @@
 </code></pre></div>
 <p>Anschließend in <code>.env</code> mindestens Pfade und Device prüfen:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">LANCE_DB_PATH</span><span class="o">=</span>./data/lance
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nv">SOURCE_DOCS_PATH</span><span class="o">=</span>./data/literatur
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">EMBED_DEVICE</span><span class="o">=</span>cuda<span class="w">        </span><span class="c1"># oder cpu</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nv">SOURCE_DOCS_PATH</span><span class="o">=</span>./data/documents
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">NOTES_PATH</span><span class="o">=</span>./data/notes
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nv">EMBED_DEVICE</span><span class="o">=</span>cuda<span class="w">        </span><span class="c1"># oder cpu</span>
 </code></pre></div>
 <p>Die vollständige Parameterliste steht unter <a href="../konfiguration/">Konfiguration</a>.</p>
-<h2 id="quelldokumente-ablegen">Quelldokumente ablegen<a class="headerlink" href="#quelldokumente-ablegen" title="Permanent link">&para;</a></h2>
-<p>Dokumente in die vorgesehenen Ordner legen (unterstützt: <code>.pdf</code>, <code>.md</code>, <code>.txt</code>,
-<code>.markdown</code>):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>data/literatur/standards/   # ISO, BSI, NIST   -&gt; Tabelle &quot;standards&quot;
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>data/literatur/research/    # Risk-Paper        -&gt; Tabelle &quot;risk_papers&quot;
+<h2 id="quellen-ablegen">Quellen ablegen<a class="headerlink" href="#quellen-ablegen" title="Permanent link">&para;</a></h2>
+<p>Dateien in die vorgesehenen Ordner legen (unterstützt: <code>.pdf</code>, <code>.md</code>,
+<code>.markdown</code>, <code>.txt</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>data/documents/   # lokale Dokumente -&gt; source_type=document
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>data/notes/       # eigene Notizen    -&gt; source_type=note
 </code></pre></div>
+<p>Ein Unterordner unter <code>documents/</code> bzw. <code>notes/</code> wird als <code>collection</code>
+übernommen.</p>
 <div class="admonition warning">
 <p class="admonition-title">Daten werden nicht versioniert</p>
-<p><code>data/literatur/</code> und <code>data/lance/</code> sind über <code>.gitignore</code> ausgeschlossen.
-Dokumente können vertraulich sein — siehe <a href="../deployment/">Deployment</a>,
-Abschnitt Sicherheit.</p>
+<p><code>data/documents/</code>, <code>data/notes/</code> und <code>data/lance/</code> sind über <code>.gitignore</code>
+ausgeschlossen. Inhalte können privat sein — siehe
+<a href="../deployment/">Deployment</a>, Abschnitt Sicherheit.</p>
 </div>
 <h2 id="modelle">Modelle<a class="headerlink" href="#modelle" title="Permanent link">&para;</a></h2>
-<p>Die Embedding- und Reranker-Modelle werden beim ersten Lauf automatisch von
-Hugging Face geladen und lokal zwischengespeichert (<code>HF_HOME</code>). Es ist kein
-manueller Download nötig.</p>
-<p>Weiter mit der <a href="../indexierung/">Indexierung</a>.</p>
+<p>Embedder (und optionaler Reranker) werden beim ersten Lauf automatisch von
+Hugging Face geladen und lokal zwischengespeichert (<code>HF_HOME</code>). Kein manueller
+Download nötig. Für die Anreicherung wird zusätzlich ein lokales
+Ollama-Modell benötigt (z. B. <code>ollama pull llama3.2</code>).</p>
+<p>Weiter mit <a href="../erfassen/">Inhalte erfassen</a>.</p>
 
 
 
