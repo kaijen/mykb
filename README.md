@@ -1,153 +1,137 @@
-# mykb — Literatur-RAG
+# mykb — persönlicher Wissensspeicher
 
-Selbst gehostete **RAG-Pipeline** (Retrieval-Augmented Generation) für eine
-persönliche Fach-Literatursammlung aus den Bereichen **Information Security**
-und **Risikomanagement**. Die Sammlung wird mit semantischen Embeddings in
-**LanceDB** indexiert und über einen **MCP-Server** direkt aus Claude (VSCode,
-Claude Desktop) durchsuchbar gemacht.
+Selbst gehosteter **Personal-Knowledge-Management-Speicher** mit semantischer
+Suche. Eigene **Dokumente**, **Notizen**, **Web-Inhalte** und eine
+**Linksammlung** werden mit Embeddings in **LanceDB** indexiert und über einen
+**MCP-Server** im Alltag aus Claude (VSCode, Claude Desktop) nutzbar gemacht.
 
-> 📖 **Vollständige Dokumentation:** <https://kaijen.github.io/mykb/>
+> 📖 **Dokumentation:** <https://kaijen.github.io/mykb/>
 > (versioniert mit MkDocs + mike, veröffentlicht über GitHub Pages)
 
-Projektkontext, Modellwahl und Konventionen sind in [`CLAUDE.md`](CLAUDE.md)
-dokumentiert.
+Projektkontext, Modellwahl und Konventionen stehen in [`CLAUDE.md`](CLAUDE.md).
 
 ## Was macht das Projekt?
 
-Standards (ISO, BSI, NIST) und Risikomanagement-Literatur liegen als PDF-,
-Markdown- oder Textdateien vor. Die Pipeline
+Vier Quelltypen landen in einem gemeinsamen, semantisch durchsuchbaren Index
+(Tabelle `documents`, Feld `source_type`):
 
-1. **extrahiert** den Text, zerlegt ihn in überlappende Chunks und
-   **dedupliziert** über einen SHA-256-Hash des Dateiinhalts,
-2. **kodiert** jeden Chunk mit dem mehrsprachigen Embedding-Modell
-   `Qwen3-Embedding-0.6B` (DE + EN nativ) zu einem Vektor,
-3. **speichert** Vektoren samt Metadaten in zwei LanceDB-Tabellen
-   (`standards`, `risk_papers`),
-4. **stellt** die Suche über einen MCP-Server bereit, den Claude als Werkzeug
-   nutzt — semantische Treffer statt Volltext-Grep.
+- **document** — lokale Dateien (PDF, Markdown, Text)
+- **note** — eigene Notizen (Markdown, Zettelkasten/Obsidian-Stil)
+- **web** — abgerufene Web-Seiten (HTML → Text, eingebettet)
+- **link** — Bookmarks mit Snapshot des Seiteninhalts und Erreichbarkeitsprüfung
 
-Der gesamte Stack läuft **lokal und ohne Cloud** (LanceDB ist serverless,
-dateibasiert). Alle eingesetzten Modelle sind **kommerziell lizenzierbar**
-(Apache 2.0), da das Projekt im Consulting-Kontext eingesetzt wird.
+Die Pipeline extrahiert Text, dedupliziert über einen SHA-256-Hash, zerlegt in
+überlappende Chunks, bettet sie mit `Qwen3-Embedding-0.6B` (DE + EN nativ) ein
+und schreibt sie **inkrementell** (Upsert über `uri` + `content_hash`) nach
+LanceDB. Der MCP-Server stellt die Suche als Werkzeug für Claude bereit.
 
-### Warum semantische Suche?
+Der Stack läuft **lokal und ohne Cloud** (LanceDB ist serverless, dateibasiert).
+Alle Modelle sind **kommerziell lizenzierbar** (Apache 2.0).
 
-Ein klassisches Stichwortsuche findet „ISO 27001 Annex A.8" nur, wenn genau
-diese Zeichenkette im Text steht. Die Embedding-Suche findet auch Passagen, die
-dasselbe Konzept mit anderen Worten beschreiben (z. B. „Asset Management" oder
-„Inventarisierung von Werten") — sprachübergreifend zwischen Deutsch und
-Englisch.
+## Bookmarks: Linkwarden + mykb
 
-## Architektur
+Bookmarks werden nicht im Eigenbau erfasst, sondern in
+[**Linkwarden**](https://github.com/linkwarden/linkwarden) (Browser-Extension,
+Tags, Collections, Archivierung). mykb ist die Index-/MCP-Schicht darüber:
+
+- `mykb links sync` zieht die Links per Linkwarden-API, übernimmt die Metadaten
+  in die `links`-Tabelle und indexiert den Lesetext als `source_type = link`
+  (semantisch durchsuchbar, überlebt Link-Rot dank Archiv).
+- `mykb links check` prüft regelmäßig die Erreichbarkeit (Link-Rot) und
+  aktualisiert den Status.
+
+So bleibt das bequeme Erfassen/Archivieren bei Linkwarden, während Suche,
+RAG-Qualität, Modell-Lizenz und MCP-Tools unter eigener Kontrolle bleiben.
+
+## Betriebsmodell: Erstellen vs. Abfragen
 
 ```
-Quelldokumente (PDF/MD/TXT)
-        │
-        ▼
-scripts/index_literature.py   ──►  LanceDB (data/lance)
-   Qwen3-Embedding (GPU, FP16)        Tabellen: standards, risk_papers
-        │
-        ▼
-server/server.py (FastMCP, SSE)  ◄── Claude (MCP-Client)
-   Query-Embedding (asymmetrisch) + optionales Reranking
-        │
-        ▼
-deploy/  Traefik (TLS) + Authelia (2FA)  für Remote-Betrieb
+ERSTELLEN (Laptop, GPU)                     ABFRAGEN (VPS, CPU)
+─────────────────────────                   ─────────────────────
+python -m mykb index   (Dokumente/Notizen)  server/server.py (FastMCP, SSE)
+python -m mykb web     (Web-Inhalte)          search_knowledge
+python -m mykb links   (Linkwarden + Check)   find_links
+        │                                      get_document_context
+        ▼                                          ▲
+   LanceDB (documents, links)  ───  Sync  ───────┘
+   Qwen3-Embedding (FP16)           (rsync/S3, noch offen)
 ```
 
-**Asymmetrisches Embedding (wichtig):** Qwen3 erwartet, dass *Queries* einen
-Instruction-Prefix bekommen, *Passages* hingegen nicht. Diese Logik steckt im
-Indexer (`Embedder`) und wird im MCP-Server beim Query-Embedding gespiegelt.
-Beide Seiten müssen dasselbe Modell und dieselbe (ggf. per `EMBED_DIM`
-gekürzte) Dimension nutzen, sonst sind die Vektoren nicht vergleichbar.
+Beide Seiten nutzen denselben **asymmetrischen** Qwen3-Embedder
+(`mykb/embedder.py`): Passages ohne Prefix, Queries mit Instruction-Prefix.
+Entscheidung: **alle Daten** werden auf den VPS synchronisiert — die Absicherung
+(Authelia 2FA, TLS, Rate Limiting) ist daher Pflicht. Der konkrete
+Sync-Mechanismus ist noch offen.
 
 ## Schnellstart
 
 ```bash
-# 1. Abhängigkeiten
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env          # Pfade/Device/Linkwarden anpassen
 
-# 2. Konfiguration
-cp .env.example .env        # Pfade/Device anpassen
+# Quellen ablegen
+#   data/documents/   (PDF/MD/TXT)
+#   data/notes/       (Markdown)
 
-# 3. Quelldokumente ablegen
-#    data/literatur/standards/   (ISO, BSI, NIST)
-#    data/literatur/research/    (Risk-Paper)
+# Indexieren
+python -m mykb index --source all
 
-# 4. Indexieren
-python scripts/index_literature.py --target all
+# Web-Seite aufnehmen
+python -m mykb web https://example.org/artikel --tags infosec,lesen
 
-# 5. MCP-Server starten
+# Linksammlung (benötigt LINKWARDEN_URL + LINKWARDEN_TOKEN)
+python -m mykb links sync
+python -m mykb links check
+python -m mykb links list --broken
+
+# MCP-Server (Abfrageseite)
 python server/server.py
 ```
 
 ### MCP-Server in Claude einbinden
 
 Der Server spricht **SSE** auf `MCP_HOST:MCP_PORT` (Default `0.0.0.0:8000`).
-In der MCP-Client-Konfiguration (z. B. VSCode `settings.json` oder Claude
-Desktop) als SSE-Endpoint `http://localhost:8000/sse` eintragen. Claude erhält
-dann die drei Werkzeuge `search_standards`, `search_risk_management` und
-`get_document_context`.
+Im MCP-Client als SSE-Endpoint eintragen:
 
-## Nutzung
+```json
+{ "mcpServers": { "mykb": { "url": "http://localhost:8000/sse" } } }
+```
 
-| Aufgabe | Befehl |
+## MCP-Tools
+
+| Tool | Zweck |
 |---|---|
-| Alles indexieren | `python scripts/index_literature.py --target all` |
-| Nur Standards | `python scripts/index_literature.py --target standards` |
-| Nur Research | `python scripts/index_literature.py --target research` |
-| Embedding-Dim kürzen | `EMBED_DIM=512 python scripts/index_literature.py --target all` |
-| CPU erzwingen | `EMBED_DEVICE=cpu python scripts/index_literature.py` |
-| Server starten | `python server/server.py` |
-
-Die **MCP-Tools** im Detail:
-
-- **`search_standards(query, limit?)`** — semantische Suche in ISO/BSI/NIST.
-- **`search_risk_management(query, limit?)`** — semantische Suche in der
-  Risikomanagement-Literatur.
-- **`get_document_context(file_hash, chunk_index, window?, table?)`** — holt die
-  benachbarten Chunks eines Treffers, um mehr Kontext um eine Fundstelle zu
-  bekommen.
+| `search_knowledge(query, source_types?, collection?, limit?)` | semantische Suche über alle Quelltypen, optional gefiltert |
+| `find_links(query, only_alive?, limit?)` | Link-Snapshots durchsuchen + Bookmark-Status (Erreichbarkeit) |
+| `get_document_context(uri, chunk_index, window?)` | benachbarte Chunks einer Fundstelle |
 
 ## Verzeichnisstruktur
 
 | Pfad | Inhalt |
 |---|---|
-| `CLAUDE.md` | Projektkontext für Claude Code |
-| `requirements.txt` | Python-Abhängigkeiten |
-| `scripts/index_literature.py` | Indexierung in LanceDB (fertig) |
-| `server/server.py` | MCP-Server mit Such-Tools |
+| `mykb/` | Python-Paket (geteilte Logik: Embedder, Ingest, Links, Store) |
+| `mykb/__main__.py` | CLI (`python -m mykb`) |
+| `server/server.py` | MCP-Server (Abfrageseite) |
 | `deploy/` | Docker Compose, Traefik, Authelia |
-| `docs/` | MkDocs-Dokumentationsquellen |
-| `data/literatur/` | Quelldokumente (read-only, nicht versioniert) |
+| `docs/` | MkDocs-Dokumentation |
+| `data/documents/`, `data/notes/` | Quellen (nicht versioniert) |
 | `data/lance/` | LanceDB-Index (generiert, nicht versioniert) |
 
 ## Konfiguration
 
-Alle Parameter werden über Environment-Variablen gesteuert; siehe
-[`.env.example`](.env.example) für die vollständige Liste mit Defaults
-(Pfade, Device, Chunking, Embedding-Dimension, Server-Port, Reranking).
-
-## Dokumentation bauen
-
-```bash
-pip install -r docs/requirements.txt
-mkdocs serve            # lokale Vorschau auf http://127.0.0.1:8000
-```
-
-Veröffentlicht wird automatisch: Ein **Git-Tag `v*` auf `main`** stößt den
-Workflow [`.github/workflows/docs.yml`](.github/workflows/docs.yml) an, der die
-Doku mit **mike** versioniert nach `gh-pages` deployt.
+Alles über Environment-Variablen; siehe [`.env.example`](.env.example)
+(Pfade, Device, Chunking, Embedding-Dimension, Server, Reranking, HTTP,
+Linkwarden).
 
 ## Status
 
-Siehe Abschnitt „Offene Punkte" in [`CLAUDE.md`](CLAUDE.md). Kurz:
-
-- [x] Indexierung in LanceDB
-- [x] MCP-Server: `search_standards`, `search_risk_management`, `get_document_context`
-- [x] Dokumentation (MkDocs + mike, GitHub Pages)
-- [ ] Reranking-Stufe (gte-multilingual-reranker)
-- [ ] Hybrid-Retrieval (BGE-M3) prüfen
-- [ ] `deploy/`: Traefik + Authelia produktiv
-- [ ] Inkrementelles Indexieren (Upsert über `file_hash`)
+- [x] Einheitlicher Index (documents) für document/note/web/link
+- [x] Inkrementelles Upsert über `uri` + `content_hash`
+- [x] Web-Ingestion (HTML → Text)
+- [x] Linkwarden-Connector + Link-Rot-Prüfung
+- [x] MCP-Server: `search_knowledge`, `find_links`, `get_document_context`
+- [ ] Reranking-Stufe (gte-multilingual-reranker) produktiv
+- [ ] VPS-Sync festlegen (rsync vs. S3) und automatisieren
+- [ ] `deploy/` produktiv härten (alle Daten remote → Absicherung kritisch)
+- [ ] Planmäßige Link-Prüfung (Cron/systemd-Timer)

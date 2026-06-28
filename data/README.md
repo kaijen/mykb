@@ -5,21 +5,25 @@ Daten-Wurzel der Pipeline. **Inhalte hier werden nicht versioniert** (siehe
 
 ```
 data/
-├── literatur/          # Quelldokumente (read-only gemountet)
-│   ├── standards/      # ISO, BSI, NIST   -> LanceDB-Tabelle "standards"
-│   └── research/       # Risk-Paper        -> LanceDB-Tabelle "risk_papers"
-└── lance/              # LanceDB-Index (generiert, wird beim Indexieren befüllt)
+├── documents/         # lokale Dateien (PDF/MD/TXT)  -> source_type=document
+├── notes/             # eigene Notizen (Markdown)     -> source_type=note
+└── lance/             # LanceDB-Index (generiert: Tabellen documents, links)
 ```
 
-## Quelldokumente
+Web-Inhalte (`source_type=web`) und Link-Snapshots (`source_type=link`) liegen
+nur im Index, nicht als Dateien hier. Ein Unterordner unter `documents/` bzw.
+`notes/` wird als `collection` übernommen.
 
-Unterstützte Formate: `.pdf`, `.md`, `.txt`, `.markdown`. Die Klassifizierung
-(`type`) erfolgt anhand des Dateinamens (iso/bsi/nist/sonstige bzw.
-bayesian/quantitative/frameworks).
+## Formate
+
+Unterstützt: `.pdf`, `.md`, `.markdown`, `.txt`. Deduplizierung über den
+SHA-256-Hash des Inhalts; Re-Index ist inkrementell (Upsert über `uri` +
+`content_hash`).
 
 ## Sicherheit
 
-Öffentliche Standards und eigene Analysen sind unkritisch. Client-spezifische
-oder vertrauliche Dokumente gehören **nicht** auf einen externen VPS, sondern
-bleiben lokal oder in einer isolierten, NDA-konformen Instanz. Siehe
-`CLAUDE.md`, Abschnitt „Sicherheit / Datenhaltung".
+Es werden **alle Daten** auf den VPS synchronisiert (Entscheidung, siehe
+`CLAUDE.md`). Damit können auch private Inhalte remote liegen — Absicherung
+(TLS, Authelia 2FA, Rate Limiting) ist Pflicht. Streng vertrauliche
+(z. B. NDA-gebundene) Dokumente im Zweifel in einer getrennten lokalen Instanz
+halten.

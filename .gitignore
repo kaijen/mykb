@@ -19,13 +19,14 @@ env/
 *.safetensors
 *.gguf
 
-# Quelldokumente und generierter Index gehören NICHT ins Repo.
+# Quelldaten und generierter Index gehören NICHT ins Repo.
 # Sie können vertraulich sein (siehe CLAUDE.md, Abschnitt Sicherheit).
-data/literatur/**
+data/documents/**
+data/notes/**
 data/lance/**
 # Verzeichnis-Platzhalter bleiben erhalten:
-!data/literatur/standards/.gitkeep
-!data/literatur/research/.gitkeep
+!data/documents/.gitkeep
+!data/notes/.gitkeep
 !data/lance/.gitkeep
 
 # Secrets / lokale Konfiguration
