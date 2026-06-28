@@ -1,8 +1,8 @@
 # MCP-Server
 
-`server/server.py` stellt den LanceDB-Index als **MCP-Server** (FastMCP,
-SSE-Transport) bereit. Claude bindet ihn als Werkzeug ein und kann die Sammlung
-semantisch durchsuchen.
+`server/server.py` stellt den LanceDB-Wissensspeicher als **MCP-Server**
+(FastMCP, SSE-Transport) bereit. Claude bindet ihn als Werkzeug ein und kann
+den Speicher semantisch durchsuchen, Verwandtes finden und Patterns anwenden.
 
 ## Starten
 
@@ -21,7 +21,7 @@ einen SSE-Server eintragen:
 ```json
 {
   "mcpServers": {
-    "literatur-rag": {
+    "mykb": {
       "url": "http://localhost:8000/sse"
     }
   }
@@ -33,41 +33,50 @@ Domain (mit TLS und Authelia davor, siehe [Deployment](deployment.md)).
 
 ## Tools
 
-### `search_standards(query, limit?)`
+| Tool | Zweck |
+|---|---|
+| `search_knowledge(query, source_types?, collection?, limit?)` | semantische Suche über alle Quelltypen, optional gefiltert |
+| `find_links(query, only_alive?, limit?)` | Link-Snapshots durchsuchen + Bookmark-Status |
+| `find_related(uri, limit?)` | semantisch verwandte Inhalte zu einem Element |
+| `recent_items(limit?, source_types?)` | zuletzt hinzugefügte Elemente (Timeline) |
+| `get_document_context(uri, chunk_index, window?)` | benachbarte Chunks einer Fundstelle |
 
-Semantische Suche in den Information-Security-Standards (ISO, BSI, NIST).
+## Prompts (Patterns)
 
-- `query` — Suchanfrage in natürlicher Sprache (DE oder EN)
-- `limit` — Anzahl Treffer (Default aus `SEARCH_RETURN_K`)
-
-### `search_risk_management(query, limit?)`
-
-Semantische Suche in der Risikomanagement-Literatur. Gleiche Parameter.
-
-### `get_document_context(file_hash, chunk_index, window?, table?)`
-
-Holt die benachbarten Chunks eines Dokuments für mehr Kontext um eine
-Fundstelle.
-
-- `file_hash` — SHA-256 aus einem Suchtreffer
-- `chunk_index` — mittlerer Chunk
-- `window` — Anzahl Chunks davor und danach (Default 2)
-- `table` — `standards` oder `risk_papers`
+Zusätzlich stehen kuratierte Analyse-Prompts bereit, anwendbar auf eine `uri`:
+`summarize`, `extract_wisdom`, `extract_claims`, `action_items` — Details unter
+[KI-Features](ki-features.md).
 
 ## Wie die Suche abläuft
 
-1. Das **Query-Embedding** wird mit dem Qwen3-Instruction-Prefix erzeugt
-   (asymmetrisch, gespiegelt aus dem Indexer — siehe
-   [Architektur](architektur.md)).
-2. LanceDB liefert die Top-`SEARCH_TOP_K` Kandidaten per Vektorsuche.
-3. **Optional:** Ist `RERANK_MODEL` gesetzt, sortiert ein Cross-Encoder die
-   Kandidaten um (defensiv: schlägt das Laden fehl, läuft die Suche ohne
-   Reranking weiter).
-4. Die Top-`SEARCH_RETURN_K` Treffer werden zurückgegeben — ohne den Vektor.
+```mermaid
+sequenceDiagram
+    participant C as Claude
+    participant S as MCP-Server
+    participant E as Embedder (Qwen3)
+    participant DB as LanceDB
+    C->>S: search_knowledge(query, ...)
+    S->>E: Query-Embedding (Instruction-Prefix)
+    E-->>S: Vektor
+    S->>DB: Vektorsuche Top-K (+ Filter)
+    DB-->>S: Kandidaten
+    opt RERANK_MODEL gesetzt
+        S->>S: Cross-Encoder sortiert um
+    end
+    S-->>C: Top-N Treffer (ohne Vektor)
+```
+
+1. **Query-Embedding** mit Qwen3-Instruction-Prefix (asymmetrisch, gespiegelt
+   aus der Ingestion — siehe [Architektur](architektur.md)).
+2. LanceDB liefert die Top-`SEARCH_TOP_K` Kandidaten, optional mit Filter
+   (Quelltyp/Sammlung).
+3. **Optional:** Ist `RERANK_MODEL` gesetzt, sortiert ein Cross-Encoder um
+   (defensiv: schlägt das Laden fehl, läuft die Suche ohne Reranking weiter).
+4. Die Top-`SEARCH_RETURN_K` Treffer gehen zurück — ohne den Vektor.
 
 !!! note "Performance"
-    Die Modelle werden erst beim ersten Tool-Aufruf geladen (langer Start,
-    knappes VRAM-Budget) und danach zwischengespeichert.
+    Modelle werden erst beim ersten Tool-Aufruf geladen (langer Start, knappes
+    VRAM-Budget) und danach zwischengespeichert.
 
 ## Datenschutz im Log
 

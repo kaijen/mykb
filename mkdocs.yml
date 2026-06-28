@@ -1,7 +1,7 @@
-site_name: mykb — Literatur-RAG
+site_name: mykb — persönlicher Wissensspeicher
 site_description: >-
-  Selbst gehostete RAG-Pipeline für Information-Security- und
-  Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.
+  Selbst gehosteter PKM-Speicher: Dokumente, Notizen, Web-Inhalte und eine
+  Linksammlung, semantisch durchsuchbar über einen MCP-Server.
 site_author: Kai Jendrian
 # Wird über GitHub Pages veröffentlicht.
 site_url: https://kaijen.github.io/mykb/
@@ -56,14 +56,22 @@ markdown_extensions:
       permalink: true
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.details
+  # Mermaid-Diagramme: ```mermaid wird als Diagramm gerendert (Material bündelt
+  # mermaid.js). Muss als custom_fence unter superfences stehen.
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
   - Überblick: index.md
   - Installation: installation.md
-  - Indexierung: indexierung.md
+  - Inhalte erfassen: erfassen.md
+  - Linksammlung: links.md
+  - KI-Features: ki-features.md
   - MCP-Server: mcp-server.md
   - Konfiguration: konfiguration.md
   - Deployment: deployment.md

@@ -1,21 +1,39 @@
 # Deployment
 
-Für den Remote-Betrieb läuft der MCP-Server hinter **Traefik** (TLS/ACME) und
-**Authelia** (Forward-Auth, 2FA). Das Verzeichnis `deploy/` enthält ein
-kommentiertes **Gerüst**, das vor dem Produktivbetrieb anzupassen ist.
+mykb trennt bewusst zwei Seiten: **Erstellen** (Laptop, GPU) und **Abfragen**
+(VPS, CPU). Beide nutzen denselben asymmetrischen Embedder.
 
-!!! danger "Vertrauliche Dokumente"
-    Öffentliche Standards und eigene Analysen sind unkritisch.
-    **Client-spezifische oder vertrauliche Dokumente gehören nicht auf einen
-    externen VPS**, sondern bleiben lokal oder in einer isolierten,
-    NDA-konformen Instanz. Im Remote-Betrieb gilt: TLS erzwingen, 2FA, Rate
-    Limiting, Logging.
+```mermaid
+flowchart LR
+    subgraph Laptop [Erstellen · Laptop · GPU]
+        ING[index / web / links]
+        EMB[Qwen3-Embedding FP16]
+        ENR[Ollama-Anreicherung]
+        ING --> EMB
+        ENR -.-> ING
+    end
+    DB[(LanceDB<br/>documents · links)]
+    EMB --> DB
+    DB ==>|Sync: rsync / S3<br/>noch offen| DBV[(LanceDB-Kopie)]
+    subgraph VPS [Abfragen · VPS · CPU]
+        TR[Traefik TLS] --> AU[Authelia 2FA] --> SRV[MCP-Server]
+        DBV --> SRV
+    end
+    CL[Claude] <-->|SSE| TR
+```
+
+!!! danger "Alle Daten landen auf dem VPS"
+    Entscheidung: der gesamte Speicher wird synchronisiert — also können auch
+    **private/vertrauliche Inhalte** remote liegen. Die Absicherung ist daher
+    **Pflicht**: TLS erzwingen, Authelia 2FA, Rate Limiting, Logging. Streng
+    vertrauliche (z. B. NDA-gebundene) Dokumente im Zweifel in einer getrennten,
+    lokalen Instanz halten.
 
 ## Inhalt von `deploy/`
 
 | Datei | Zweck |
 |---|---|
-| `Dockerfile` | Image für Indexer + MCP-Server |
+| `Dockerfile` | Image für Ingest + MCP-Server |
 | `docker-compose.yml` | Traefik + Authelia + MCP-Server |
 | `authelia/configuration.example.yml` | Authelia-Config (Vorlage) |
 | `authelia/users_database.example.yml` | Benutzerdatenbank (Vorlage) |
@@ -26,7 +44,7 @@ kommentiertes **Gerüst**, das vor dem Produktivbetrieb anzupassen ist.
 cd deploy
 
 # 1. Domain und ACME-E-Mail setzen
-export DOMAIN=rag.example.com ACME_EMAIL=admin@example.com
+export DOMAIN=mykb.example.com ACME_EMAIL=admin@example.com
 
 # 2. Authelia konfigurieren (Secrets NICHT ins Repo)
 cp authelia/configuration.example.yml   authelia/configuration.yml
@@ -36,8 +54,8 @@ cp authelia/users_database.example.yml  authelia/users_database.yml
 # 3. Bauen und starten
 docker compose up -d --build
 
-# 4. Index befüllen (einmalig / nach Dokumentänderungen)
-docker compose run --rm mcp python scripts/index_literature.py --target all
+# 4. Index befüllen (einmalig / nach Änderungen)
+docker compose run --rm mcp python -m mykb index --source all
 ```
 
 ## Sicherheitsmerkmale
@@ -49,13 +67,15 @@ docker compose run --rm mcp python scripts/index_literature.py --target all
 - **Rate Limiting** — Authelia-`regulation` gegen Brute-Force.
 - **Secrets** — über Docker Secrets / Environment, nie im Repo.
 
+## Sync (noch offen)
+
+LanceDB sind nur Dateien. Der Transport Laptop → VPS ist bewusst noch nicht
+festgelegt — Optionen: `rsync` über SSH oder Object Storage (S3/MinIO), aus dem
+der VPS direkt liest. Die Konfiguration ist über Environment-Variablen bereits
+entkoppelt (siehe [Konfiguration](konfiguration.md)).
+
 ## GPU im Container
 
-Das Default-Image ist CPU-only. Für GPU-Betrieb ein CUDA-Basisimage wählen, das
-nvidia-Runtime im Compose aktivieren und `EMBED_DEVICE=cuda` setzen.
-
-## Spätere Migration auf einen VPS
-
-Ein Umzug auf einen VPS ist vorgesehen — dann ggf. CPU-only-Inferenz mit
-kleineren Modellen. Die Konfiguration ist dafür bereits über Environment-
-Variablen entkoppelt (siehe [Konfiguration](konfiguration.md)).
+Das Default-Image ist CPU-only (passt zur VPS-Abfrageseite). Für GPU-Ingest ein
+CUDA-Basisimage wählen, das nvidia-Runtime im Compose aktivieren und
+`EMBED_DEVICE=cuda` setzen.

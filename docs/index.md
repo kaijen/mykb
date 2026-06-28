@@ -1,61 +1,67 @@
 # Überblick
 
-**mykb** ist eine selbst gehostete **RAG-Pipeline** (Retrieval-Augmented
-Generation) für eine persönliche Fach-Literatursammlung aus den Bereichen
-**Information Security** und **Risikomanagement**.
+**mykb** ist ein selbst gehosteter, persönlicher Wissensspeicher (Personal
+Knowledge Management). Eigene **Dokumente**, **Notizen**, **Web-Inhalte** und
+eine **Linksammlung** werden mit semantischen Embeddings in **LanceDB**
+indexiert und über einen **MCP-Server** im Alltag aus Claude (VSCode, Claude
+Desktop) nutzbar gemacht — semantische Treffer statt Volltext-Grep,
+sprachübergreifend zwischen Deutsch und Englisch.
 
-Die Sammlung wird mit semantischen Embeddings in **LanceDB** indexiert und über
-einen **MCP-Server** direkt aus Claude (VSCode, Claude Desktop) durchsuchbar
-gemacht — semantische Treffer statt Volltext-Grep, sprachübergreifend zwischen
-Deutsch und Englisch.
+!!! info "Leitlinien"
+    Stack **lokal ohne Cloud** (LanceDB ist serverless, dateibasiert). Modelle
+    bevorzugt **kommerziell lizenzierbar** (Apache 2.0); Tooling darf auch
+    Copyleft sein (Eigenbetrieb). Bookmarks kommen aus **Linkwarden**, der
+    KI-Layer im Alltag ist **Claude über MCP**.
 
-!!! info "Kontext"
-    Einsatz im Consulting-Kontext. Daher gilt: alle eingesetzten Modelle sind
-    **kommerziell lizenzierbar** (Apache 2.0), der Stack läuft **lokal ohne
-    Cloud**, und vertrauliche Dokumente bleiben lokal (siehe
-    [Deployment](deployment.md)).
+## Vier Quelltypen, ein Index
 
-## Wie es funktioniert
+Alles landet in der Tabelle `documents` (Feld `source_type`) und ist damit
+einheitlich durchsuchbar:
 
-Standards (ISO, BSI, NIST) und Risikomanagement-Literatur liegen als PDF-,
-Markdown- oder Textdateien vor. Die Pipeline
+- **document** — lokale Dateien (PDF, Markdown, Text)
+- **note** — eigene Notizen (Markdown, Zettelkasten/Obsidian-Stil)
+- **web** — abgerufene Web-Seiten (HTML → Text)
+- **link** — Bookmarks mit Snapshot des Seiteninhalts (aus Linkwarden)
 
-1. **extrahiert** den Text, zerlegt ihn in überlappende Chunks und
-   **dedupliziert** über einen SHA-256-Hash des Dateiinhalts,
-2. **kodiert** jeden Chunk mit `Qwen3-Embedding-0.6B` (DE + EN nativ) zu einem
-   Vektor,
-3. **speichert** Vektoren samt Metadaten in zwei LanceDB-Tabellen
-   (`standards`, `risk_papers`),
-4. **stellt** die Suche über einen MCP-Server bereit, den Claude als Werkzeug
-   nutzt.
+## Architektur auf einen Blick
 
-```
-Quelldokumente (PDF/MD/TXT)
-        │
-        ▼
-scripts/index_literature.py   ──►  LanceDB (data/lance)
-   Qwen3-Embedding (GPU, FP16)        Tabellen: standards, risk_papers
-        │
-        ▼
-server/server.py (FastMCP, SSE)  ◄── Claude (MCP-Client)
-   Query-Embedding (asymmetrisch) + optionales Reranking
-        │
-        ▼
-deploy/  Traefik (TLS) + Authelia (2FA)  für Remote-Betrieb
+```mermaid
+flowchart TD
+    subgraph Quellen
+        D[Dokumente<br/>PDF/MD/TXT]
+        N[Notizen<br/>Markdown]
+        W[Web-Seiten]
+        LW[Linkwarden<br/>Bookmarks + Archiv]
+    end
+
+    D --> ING[Ingest<br/>extrahieren · chunken · embedden]
+    N --> ING
+    W --> ING
+    LW -->|API-Sync| ING
+
+    ING --> DB[(LanceDB<br/>documents · links)]
+    OLL[Ollama<br/>Anreicherung, CPU] -.optional.-> ING
+
+    DB --> SRV[MCP-Server<br/>FastMCP · SSE]
+    SRV <-->|Tools + Prompts| CL[Claude<br/>VSCode · Desktop]
+
+    classDef store fill:#e8eaf6,stroke:#3f51b5;
+    class DB store;
 ```
 
 ## Warum semantische Suche?
 
-Eine klassische Stichwortsuche findet „ISO 27001 Annex A.8" nur, wenn genau
-diese Zeichenkette im Text steht. Die Embedding-Suche findet auch Passagen, die
-dasselbe Konzept mit anderen Worten beschreiben (z. B. „Asset Management" oder
-„Inventarisierung von Werten") — und das sprachübergreifend.
+Eine Stichwortsuche findet „ISO 27001 Annex A.8" nur bei exakter Zeichenkette.
+Die Embedding-Suche findet auch Passagen, die dasselbe Konzept anders benennen
+(z. B. „Asset Management" oder „Inventarisierung von Werten") — sprachübergreifend.
 
 ## Nächste Schritte
 
 - [Installation](installation.md) — Umgebung einrichten
-- [Indexierung](indexierung.md) — Dokumente in LanceDB überführen
+- [Inhalte erfassen](erfassen.md) — Dokumente, Notizen, Web indexieren
+- [Linksammlung](links.md) — Linkwarden anbinden, Link-Rot prüfen
+- [KI-Features](ki-features.md) — Anreicherung, Patterns, Auto-Sammlungen
 - [MCP-Server](mcp-server.md) — Suche in Claude einbinden
 - [Konfiguration](konfiguration.md) — Environment-Variablen
-- [Deployment](deployment.md) — Remote-Betrieb mit TLS und 2FA
+- [Deployment](deployment.md) — Erstellen (Laptop) vs. Abfragen (VPS)
 - [Architektur & Modelle](architektur.md) — Modellwahl und Hintergründe
