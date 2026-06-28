@@ -1,0 +1,52 @@
+name: ci
+
+# Lint + Tests bei jedem PR gegen main und bei jedem Push auf main.
+# Bewusst OHNE torch / GPU: Tests nutzen Dummy-Vektoren kleiner Dimension und
+# importieren weder den Embedder noch den MCP-Server.
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Test-Abhängigkeiten installieren (ohne torch/mcp)
+        run: pip install -r requirements-dev.txt
+
+      - name: Ruff (Lint)
+        run: ruff check .
+
+      - name: Pytest
+        run: pytest -q
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Doku-Abhängigkeiten installieren
+        run: pip install mkdocs-material mike
+
+      - name: MkDocs strikt bauen
+        run: mkdocs build --strict

@@ -61,7 +61,9 @@ def cmd_links(args, cfg) -> None:
         if args.broken:
             rows = [r for r in rows if r.get("status") not in {"ok", "unchecked"}]
         for r in sorted(rows, key=lambda r: r.get("status", "")):
-            print(f"[{r.get('status', '?'):9}] {r.get('url', '')}  — {r.get('title', '')}")
+            print(
+                f"[{r.get('status', '?'):9}] {r.get('url', '')}  — {r.get('title', '')}"
+            )
         print(f"\n{len(rows)} Link(s)")
 
 
@@ -90,7 +92,10 @@ def cmd_status(args, cfg) -> None:
         return
 
     docs = st.get("documents", {})
-    print(f"Dokumente: {docs.get('total_sources', 0)} Quellen, {docs.get('total_chunks', 0)} Chunks")
+    print(
+        f"Dokumente: {docs.get('total_sources', 0)} Quellen, "
+        f"{docs.get('total_chunks', 0)} Chunks"
+    )
     for stype, n in sorted(docs.get("sources_by_type", {}).items()):
         print(f"   {stype:9} {n}")
     links = st.get("links", {})
@@ -142,7 +147,9 @@ def cmd_collections(args, cfg) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="mykb", description="Persönlicher Wissensspeicher")
+    parser = argparse.ArgumentParser(
+        prog="mykb", description="Persönlicher Wissensspeicher"
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p_index = sub.add_parser("index", help="Lokale Dokumente/Notizen indexieren")
@@ -175,7 +182,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_process.set_defaults(func=cmd_process)
 
     p_watch = sub.add_parser(
-        "watch", help="Ereignisgesteuert verarbeiten (Capture-Trigger + Intervall, dann Sync)"
+        "watch",
+        help="Ereignisgesteuert verarbeiten (Capture-Trigger + Intervall, dann Sync)",
     )
     p_watch.set_defaults(func=cmd_watch)
 

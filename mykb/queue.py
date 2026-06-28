@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import structlog
@@ -27,7 +27,7 @@ logger = structlog.get_logger()
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _safe_name(name: str | None) -> str:
@@ -136,17 +136,28 @@ def drain(cfg: Config) -> int:
                     note=rec.get("note", ""),
                     collection=rec.get("collection", ""),
                 )
+                jpath.unlink(missing_ok=True)
             elif rec["type"] == "file":
                 blob = qd / rec["blob"]
-                root = Path(cfg.notes_path if rec.get("kind") == "note" else cfg.docs_path)
-                target_dir = root / rec["collection"] if rec.get("collection") else root
-                target_dir.mkdir(parents=True, exist_ok=True)
-                (target_dir / rec["filename"]).write_bytes(blob.read_bytes())
+                if blob.exists():
+                    root = Path(
+                        cfg.notes_path if rec.get("kind") == "note" else cfg.docs_path
+                    )
+                    target_dir = (
+                        root / rec["collection"] if rec.get("collection") else root
+                    )
+                    target_dir.mkdir(parents=True, exist_ok=True)
+                    (target_dir / rec["filename"]).write_bytes(blob.read_bytes())
+                else:
+                    # Blob bereits weg (z. B. Crash nach Auslieferung) -> erledigt.
+                    logger.warning("drain_blob_missing", id=rec.get("id"))
+                # Metadaten zuerst entfernen -> Eintrag gilt sofort als erledigt,
+                # ein verwaister Blob ist harmlos.
+                jpath.unlink(missing_ok=True)
                 blob.unlink(missing_ok=True)
             else:
                 logger.warning("drain_unknown_type", id=rec.get("id"))
                 continue
-            jpath.unlink(missing_ok=True)
             count += 1
         except Exception as exc:  # Eintrag bleibt für den nächsten Versuch
             logger.error("drain_item_failed", id=rec.get("id"), error=str(exc)[:200])

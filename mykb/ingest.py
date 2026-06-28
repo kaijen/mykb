@@ -3,14 +3,14 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import structlog
 
 from . import extract, store, web
 from .chunking import chunk_text
-from .config import Config, DOC_SUFFIXES
+from .config import DOC_SUFFIXES, Config
 from .embedder import Embedder
 from .enrich import Enricher
 
@@ -18,7 +18,7 @@ logger = structlog.get_logger()
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 class Ingestor:
@@ -50,10 +50,13 @@ class Ingestor:
         ts = _now()
         n = len(chunks)
         records: list[dict] = []
-        for i, (chunk, vec) in enumerate(zip(chunks, vectors)):
+        uri_key = extract.sha256_text(uri)[:16]
+        for i, (chunk, vec) in enumerate(zip(chunks, vectors, strict=True)):
             records.append(
                 {
-                    "id": f"{content_hash[:16]}_{i}",
+                    # id quellenstabil aus uri (nicht content_hash) -> global
+                    # eindeutig, auch wenn zwei Quellen denselben Inhalt haben.
+                    "id": f"{uri_key}_{i}",
                     "source_type": source_type,
                     "collection": collection,
                     "tags": tags,

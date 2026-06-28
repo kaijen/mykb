@@ -10,7 +10,7 @@ Der Watcher schreibt nach jedem Lauf/Sync einen kleinen Zustand
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import structlog
@@ -21,7 +21,7 @@ logger = structlog.get_logger()
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _state_path(cfg: Config) -> Path:
