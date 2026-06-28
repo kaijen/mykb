@@ -17,7 +17,8 @@ lxml>=5.3.0
 # Logging
 structlog>=24.4.0
 
-# MCP-Server (für server/server.py)
+# MCP-Server (server/server.py) und Capture-Dienst (mykb capture)
 mcp>=1.2.0
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
+python-multipart>=0.0.9  # Datei-Uploads im Capture-Dienst

@@ -43,6 +43,26 @@ Tags, Collections, Archivierung). mykb ist die Index-/MCP-Schicht darüber:
 So bleibt das bequeme Erfassen/Archivieren bei Linkwarden, während Suche,
 RAG-Qualität, Modell-Lizenz und MCP-Tools unter eigener Kontrolle bleiben.
 
+## Von unterwegs erfassen (Tailscale)
+
+Ein schlanker **Capture-Dienst** macht den Laptop über das bestehende
+**Tailscale**-Netz erreichbar, um Dokumente und Links von überall zu übergeben:
+
+```bash
+python -m mykb capture          # Dienst auf 127.0.0.1:8765
+tailscale serve --bg 8765       # im Tailnet als HTTPS veröffentlichen (nur Tailnet)
+
+# von unterwegs übergeben
+scripts/mykb-send.sh url  https://example.org "lesen"          # -> Linkwarden
+scripts/mykb-send.sh file ~/paper.pdf document forschung        # -> Inbox
+
+python -m mykb process          # Inbox verarbeiten: index + links sync
+```
+
+Übergaben landen in der **Inbox** (Datei → Quellordner, Link → Linkwarden); das
+Embedding erledigt `mykb process` (z. B. per systemd-Timer). Zugriffsschutz über
+die Tailnet-Identität, kein Token. Details: [docs/capture.md](docs/capture.md).
+
 ## Betriebsmodell: Erstellen vs. Abfragen
 
 ```

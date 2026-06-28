@@ -28,7 +28,11 @@ Bewusste Trennung der beiden Seiten:
 
 - **Erstellen (Laptop, GPU):** Ingestion (Dokumente/Notizen/Web), Embedding
   (Qwen3, FP16), Pflege der Linksammlung und Link-Rot-Prüfung. Erzeugt die
-  LanceDB-Dateien (`documents`, `links`).
+  LanceDB-Dateien (`documents`, `links`). Erreichbar von unterwegs über das
+  bestehende **Tailscale**-Netz: ein Capture-Dienst (`mykb capture`) nimmt
+  Dateien und Links als Inbox entgegen (Datei → Quellordner, Link → Linkwarden),
+  veröffentlicht via `tailscale serve` (nur Tailnet, kein Token). Verarbeitung
+  per `mykb process`.
 - **Abfragen (VPS, CPU):** Der MCP-Server beantwortet Queries. Er braucht
   denselben Embedder für das **Query-Embedding** (asymmetrisch). Qwen3-0.6B auf
   CPU ist für einzelne Queries schnell genug.
@@ -94,8 +98,12 @@ mykb/
 │   ├── extract.py             # PDF/MD/TXT + Web (HTML → Text)
 │   ├── store.py               # LanceDB: connect, Upsert, Query
 │   ├── ingest.py              # Dokumente/Notizen/Web → Tabelle documents
-│   ├── links.py               # Linksammlung + Erreichbarkeitsprüfung
-│   └── __main__.py            # CLI: index, add-url, links ...
+│   ├── links.py               # Linkwarden-Connector + Erreichbarkeitsprüfung
+│   ├── enrich.py              # KI-Anreicherung (Ollama): summary + Auto-Tags
+│   ├── collections.py         # Auto-Sammlungen (Clustering)
+│   ├── patterns.py            # kuratierte Analyse-Prompts (MCP-Prompts)
+│   ├── capture.py             # Capture-Dienst (Erfassen von unterwegs)
+│   └── __main__.py            # CLI: index, web, links, process, capture ...
 ├── server/
 │   └── server.py              # MCP-Server (Abfrageseite, VPS)
 ├── deploy/                    # Docker, Traefik, Authelia
@@ -157,6 +165,10 @@ python -m mykb index --source all --enrich
 python -m mykb collections --threshold 0.6
 python -m mykb collections --apply
 
+# Erfassen von unterwegs (Tailscale): Dienst starten, dann Inbox verarbeiten
+python -m mykb capture                         # 127.0.0.1:8765 (tailscale serve davor)
+python -m mykb process                         # index (documents+notes) + links sync
+
 # Optionen analog zur Indexierung
 EMBED_DIM=512 python -m mykb index --source all
 EMBED_DEVICE=cpu python -m mykb index --source all
@@ -169,7 +181,8 @@ python server/server.py
 
 `LANCE_DB_PATH`, `SOURCE_DOCS_PATH`, `NOTES_PATH`, `EMBED_DEVICE` (cuda/cpu),
 `EMBED_BATCH_SIZE`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `EMBED_DIM`,
-`MCP_HOST`, `MCP_PORT`, `SEARCH_TOP_K`, `SEARCH_RETURN_K`,
+`MCP_HOST`, `MCP_PORT`, `CAPTURE_HOST`, `CAPTURE_PORT`,
+`SEARCH_TOP_K`, `SEARCH_RETURN_K`,
 `RERANK_MODEL`, `RERANK_DEVICE`,
 `HTTP_TIMEOUT`, `HTTP_USER_AGENT`, `LINK_CHECK_CONCURRENCY`,
 `ENRICH`, `OLLAMA_URL`, `OLLAMA_MODEL`, `ENRICH_MAX_CHARS`,
@@ -208,8 +221,9 @@ an: `summarize`, `extract_wisdom`, `extract_claims`, `action_items`
    der VPS LanceDB direkt liest) und automatisieren.
 4. `deploy/`: Compose/Traefik/Authelia produktiv härten (alle Daten remote →
    Absicherung kritisch).
-5. Link-Rot-Prüfung planmäßig ausführen (Cron/systemd-Timer) und Web-Snapshots
-   periodisch auffrischen.
+5. Web-Snapshots periodisch auffrischen. (Planmäßige Verarbeitung inkl.
+   Link-Rot-Prüfung über `mykb process` ist umgesetzt — Vorlagen unter
+   `deploy/systemd/` und `deploy/cron/`.)
 6. Notizen-Quelle: optional Frontmatter/Tags aus Markdown übernehmen.
 
 ### Fabric-inspirierte Ausbaustufen (siehe fabric.so)

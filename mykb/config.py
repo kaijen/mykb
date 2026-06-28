@@ -38,6 +38,12 @@ class Config:
     # --- MCP-Server ---
     host: str = os.getenv("MCP_HOST", "0.0.0.0")
     port: int = int(os.getenv("MCP_PORT", "8000"))
+
+    # --- Capture-Dienst (Erfassen von unterwegs über Tailscale) ---
+    # Bindet bewusst an localhost; die Tailnet-Veröffentlichung übernimmt
+    # `tailscale serve` (nur Tailnet-Mitglieder, HTTPS via MagicDNS).
+    capture_host: str = os.getenv("CAPTURE_HOST", "127.0.0.1")
+    capture_port: int = int(os.getenv("CAPTURE_PORT", "8765"))
     top_k: int = int(os.getenv("SEARCH_TOP_K", "20"))
     return_k: int = int(os.getenv("SEARCH_RETURN_K", "5"))
     rerank_model: str | None = os.getenv("RERANK_MODEL") or None

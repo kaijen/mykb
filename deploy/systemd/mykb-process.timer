@@ -1,0 +1,14 @@
+# Löst mykb-process.service planmäßig aus (stündlich).
+[Unit]
+Description=mykb: Inbox planmäßig verarbeiten
+
+[Timer]
+OnCalendar=hourly
+# Verpasste Läufe nachholen (z. B. wenn der Laptop schlief). Wichtig für die
+# Inbox-Logik: nichts bleibt liegen.
+Persistent=true
+# Etwas streuen, damit nicht alles exakt zur vollen Stunde losläuft.
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

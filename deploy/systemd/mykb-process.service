@@ -1,0 +1,17 @@
+# mykb: Inbox verarbeiten (index documents+notes + links sync).
+# Wird vom Timer mykb-process.timer ausgelöst. User-Unit nach
+# ~/.config/systemd/user/ kopieren und Pfade prüfen (Annahme: Repo unter
+# ~/mykb mit venv unter ~/mykb/.venv).
+[Unit]
+Description=mykb: Inbox verarbeiten (index + links sync)
+# Erst nach Netz und Tailscale starten (Linkwarden/Web-Abruf brauchen Netz).
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/mykb
+EnvironmentFile=%h/mykb/.env
+ExecStart=%h/mykb/.venv/bin/python -m mykb process
+# Niedrige Priorität, damit der Lauf den Laptop nicht ausbremst.
+Nice=10

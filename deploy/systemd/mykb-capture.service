@@ -1,0 +1,17 @@
+# mykb: dauerhaft laufender Capture-Dienst (Erfassen von unterwegs).
+# Bindet an 127.0.0.1; im Tailnet getrennt mit 'tailscale serve --bg 8765'
+# veröffentlichen (siehe docs/capture.md).
+[Unit]
+Description=mykb Capture-Dienst (Erfassen von unterwegs)
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=%h/mykb
+EnvironmentFile=%h/mykb/.env
+ExecStart=%h/mykb/.venv/bin/python -m mykb capture
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
