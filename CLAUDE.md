@@ -32,7 +32,9 @@ Bewusste Trennung der beiden Seiten:
   bestehende **Tailscale**-Netz: ein Capture-Dienst (`mykb capture`) nimmt
   Dateien und Links als Inbox entgegen (Datei → Quellordner, Link → Linkwarden),
   veröffentlicht via `tailscale serve` (nur Tailnet, kein Token). Verarbeitung
-  per `mykb process`.
+  ereignisgesteuert: Capture setzt einen Trigger, `mykb watch` verarbeitet
+  debounced und spiegelt direkt danach per rsync zum VPS (`mykb process` bleibt
+  als Einzellauf für systemd/cron).
 - **Abfragen (VPS, CPU):** Der MCP-Server beantwortet Queries. Er braucht
   denselben Embedder für das **Query-Embedding** (asymmetrisch). Qwen3-0.6B auf
   CPU ist für einzelne Queries schnell genug.
@@ -42,11 +44,11 @@ Sichtbarkeits-Flag). Damit ist die Absicherung des VPS (Authelia 2FA, TLS,
 Rate Limiting) Pflicht — siehe „Sicherheit / Datenhaltung".
 
 **Betrieb Docker-first** (am Host nur Docker, am Laptop zusätzlich das NVIDIA
-Container Toolkit): `deploy/docker-compose.laptop.yml` (capture, scheduler/GPU,
-ollama, linkwarden, sync) und `deploy/docker-compose.yml` (VPS: traefik,
-authelia, mcp). Der **Sync** Laptop→VPS läuft über einen **rsync-Sidecar**, der
-das `lance`-Verzeichnis per SSH spiegelt. Die systemd-/cron-Vorlagen sind die
-bare-metal-Alternative ohne Docker.
+Container Toolkit): `deploy/docker-compose.laptop.yml` (capture, scheduler/GPU
+mit `mykb watch`, ollama, linkwarden) und `deploy/docker-compose.yml` (VPS:
+traefik, authelia, mcp). Der **Sync** Laptop→VPS läuft im scheduler **direkt nach
+jedem Lauf** (rsync über SSH) — kein separater Sidecar, nie mitten in einen
+Schreibvorgang. Die systemd-/cron-Vorlagen sind die bare-metal-Alternative.
 
 ## Hardware
 
@@ -168,9 +170,10 @@ python -m mykb index --source all --enrich
 python -m mykb collections --threshold 0.6
 python -m mykb collections --apply
 
-# Erfassen von unterwegs (Tailscale): Dienst starten, dann Inbox verarbeiten
+# Erfassen von unterwegs (Tailscale): Dienst + ereignisgesteuerte Verarbeitung
 python -m mykb capture                         # 127.0.0.1:8765 (tailscale serve davor)
-python -m mykb process                         # index (documents+notes) + links sync
+python -m mykb watch                           # Trigger-gesteuert verarbeiten + Sync
+python -m mykb process                         # einmaliger Lauf (systemd/cron)
 
 # Optionen analog zur Indexierung
 EMBED_DIM=512 python -m mykb index --source all
@@ -185,6 +188,8 @@ python server/server.py
 `LANCE_DB_PATH`, `SOURCE_DOCS_PATH`, `NOTES_PATH`, `EMBED_DEVICE` (cuda/cpu),
 `EMBED_BATCH_SIZE`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `EMBED_DIM`,
 `MCP_HOST`, `MCP_PORT`, `CAPTURE_HOST`, `CAPTURE_PORT`,
+`STATE_DIR`, `PROCESS_DEBOUNCE`, `PROCESS_INTERVAL`, `WATCH_POLL`,
+`VPS_SSH_TARGET`, `SSH_KEY`,
 `SEARCH_TOP_K`, `SEARCH_RETURN_K`,
 `RERANK_MODEL`, `RERANK_DEVICE`,
 `HTTP_TIMEOUT`, `HTTP_USER_AGENT`, `LINK_CHECK_CONCURRENCY`,
@@ -220,9 +225,8 @@ an: `summarize`, `extract_wisdom`, `extract_claims`, `action_items`
    sortieren. Reranker-Device abhängig vom Embedder-Budget.
 2. Hybrid-Retrieval prüfen: bei Bedarf BGE-M3 statt Qwen3 für dense+sparse,
    um exakte Fachbegriffe (z. B. „ISO 27001 Annex A.8") besser zu treffen.
-3. VPS-Sync produktiv absichern: rsync-Sidecar ist umgesetzt; Konsistenz beim
-   Spiegeln während laufender Schreibvorgänge prüfen (ggf. nach `process`
-   triggern statt fix im Intervall).
+3. VPS-Sync: rsync läuft jetzt im scheduler direkt nach jedem Lauf (Konsistenz
+   gelöst). Offen: Robustheit bei Abbruch/Teil-Sync, optional Object Storage.
 4. `deploy/`: Compose/Traefik/Authelia produktiv härten (alle Daten remote →
    Absicherung kritisch).
 5. Web-Snapshots periodisch auffrischen. (Planmäßige Verarbeitung inkl.

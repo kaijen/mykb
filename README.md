@@ -56,12 +56,14 @@ tailscale serve --bg 8765       # im Tailnet als HTTPS veröffentlichen (nur Tai
 scripts/mykb-send.sh url  https://example.org "lesen"          # -> Linkwarden
 scripts/mykb-send.sh file ~/paper.pdf document forschung        # -> Inbox
 
-python -m mykb process          # Inbox verarbeiten: index + links sync
+python -m mykb watch            # ereignisgesteuert verarbeiten + Sync (Docker: scheduler)
 ```
 
-Übergaben landen in der **Inbox** (Datei → Quellordner, Link → Linkwarden); das
-Embedding erledigt `mykb process` (z. B. per systemd-Timer). Zugriffsschutz über
-die Tailnet-Identität, kein Token. Details: [docs/capture.md](docs/capture.md).
+Übergaben landen in der **Inbox** (Datei → Quellordner, Link → Linkwarden) und
+setzen einen Trigger; `mykb watch` verarbeitet debounced und spiegelt direkt
+danach zum VPS — Erfasstes ist meist in 1–2 min durchsuchbar. Im Docker-Betrieb
+macht das der `scheduler`-Container automatisch. Zugriffsschutz über die
+Tailnet-Identität, kein Token. Details: [docs/capture.md](docs/capture.md).
 
 ## Betriebsmodell: Erstellen vs. Abfragen
 

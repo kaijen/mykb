@@ -71,6 +71,13 @@ def cmd_capture(args, cfg) -> None:
     serve(cfg)
 
 
+def cmd_watch(args, cfg) -> None:
+    """Ereignisgesteuert verarbeiten: auf Capture-Trigger/Intervall reagieren."""
+    from .scheduler import watch
+
+    watch(cfg)
+
+
 def cmd_process(args, cfg) -> None:
     """Inbox verarbeiten: lokale Quellen indexieren und Links aus Linkwarden ziehen."""
     from . import links
@@ -126,12 +133,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_capture.set_defaults(func=cmd_capture)
 
     p_process = sub.add_parser(
-        "process", help="Inbox verarbeiten: index (documents+notes) + links sync"
+        "process", help="Inbox einmal verarbeiten: index (documents+notes) + links sync"
     )
     p_process.add_argument(
         "--enrich", action="store_true", help="Anreicherung beim Indexieren (Ollama)"
     )
     p_process.set_defaults(func=cmd_process)
+
+    p_watch = sub.add_parser(
+        "watch", help="Ereignisgesteuert verarbeiten (Capture-Trigger + Intervall, dann Sync)"
+    )
+    p_watch.set_defaults(func=cmd_watch)
 
     p_coll = sub.add_parser(
         "collections", help="Themen-Cluster vorschlagen (Auto-Sammlungen)"
