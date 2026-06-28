@@ -41,9 +41,12 @@ Entscheidung: **alle Daten** werden auf den VPS synchronisiert (kein
 Sichtbarkeits-Flag). Damit ist die Absicherung des VPS (Authelia 2FA, TLS,
 Rate Limiting) Pflicht — siehe „Sicherheit / Datenhaltung".
 
-Der **Sync-Mechanismus** (rsync über SSH vs. Object Storage) ist noch offen.
-Vorerst wird lokal gebaut und betrieben; LanceDB sind nur Dateien und damit
-später leicht zu synchronisieren.
+**Betrieb Docker-first** (am Host nur Docker, am Laptop zusätzlich das NVIDIA
+Container Toolkit): `deploy/docker-compose.laptop.yml` (capture, scheduler/GPU,
+ollama, linkwarden, sync) und `deploy/docker-compose.yml` (VPS: traefik,
+authelia, mcp). Der **Sync** Laptop→VPS läuft über einen **rsync-Sidecar**, der
+das `lance`-Verzeichnis per SSH spiegelt. Die systemd-/cron-Vorlagen sind die
+bare-metal-Alternative ohne Docker.
 
 ## Hardware
 
@@ -217,8 +220,9 @@ an: `summarize`, `extract_wisdom`, `extract_claims`, `action_items`
    sortieren. Reranker-Device abhängig vom Embedder-Budget.
 2. Hybrid-Retrieval prüfen: bei Bedarf BGE-M3 statt Qwen3 für dense+sparse,
    um exakte Fachbegriffe (z. B. „ISO 27001 Annex A.8") besser zu treffen.
-3. VPS-Sync konkret festlegen (rsync über SSH vs. Object Storage/S3, aus dem
-   der VPS LanceDB direkt liest) und automatisieren.
+3. VPS-Sync produktiv absichern: rsync-Sidecar ist umgesetzt; Konsistenz beim
+   Spiegeln während laufender Schreibvorgänge prüfen (ggf. nach `process`
+   triggern statt fix im Intervall).
 4. `deploy/`: Compose/Traefik/Authelia produktiv härten (alle Daten remote →
    Absicherung kritisch).
 5. Web-Snapshots periodisch auffrischen. (Planmäßige Verarbeitung inkl.

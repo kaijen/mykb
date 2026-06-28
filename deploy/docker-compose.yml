@@ -1,12 +1,15 @@
-# Remote-Betrieb: Traefik (TLS/ACME) + Authelia (Forward-Auth, 2FA) vor dem
-# MCP-Server. GERÜST — vor Produktivbetrieb anpassen:
-#   - DOMAIN und ACME-E-Mail setzen
+# Abfrage-Seite (VPS): Traefik (TLS/ACME) + Authelia (Forward-Auth, 2FA) vor dem
+# MCP-Server. Der Index (lance) kommt per rsync vom Laptop (siehe sync-Service in
+# docker-compose.laptop.yml). GERÜST — vor Produktivbetrieb anpassen:
+#   - DOMAIN und ACME-E-Mail setzen (deploy/.env)
 #   - Authelia-Config und Secrets befüllen (siehe deploy/authelia/)
-#   - Bei vertraulichen Dokumenten: NICHT auf öffentlichem VPS (siehe CLAUDE.md)
+#   - rsync-Zielpfad = das hier gemountete ../data/lance
 #
 # Secrets kommen über Docker Secrets / .env, NIE ins Repo.
+#
+#   docker compose -f deploy/docker-compose.yml up -d --build
 
-x-domain: &domain "${DOMAIN:-rag.example.com}"
+x-domain: &domain "${DOMAIN:-mykb.example.com}"
 
 services:
   traefik:
@@ -55,20 +58,15 @@ services:
     restart: unless-stopped
     environment:
       - "LANCE_DB_PATH=/data/lance"
-      - "SOURCE_DOCS_PATH=/data/documents"
-      - "NOTES_PATH=/data/notes"
-      # Im Container per Default CPU; GPU erfordert CUDA-Image + Runtime.
-      - "EMBED_DEVICE=${EMBED_DEVICE:-cpu}"
+      # Abfrageseite: reine CPU-Inferenz (Query-Embedding) genügt.
+      - "EMBED_DEVICE=cpu"
       - "MCP_HOST=0.0.0.0"
       - "MCP_PORT=8000"
-      # Linkwarden optional (für 'mykb links sync'); Secret via .env.
-      # - "LINKWARDEN_URL=${LINKWARDEN_URL:-}"
-      # - "LINKWARDEN_TOKEN=${LINKWARDEN_TOKEN:-}"
+      # EMBED_DIM muss zum Laptop passen, falls dort gekürzt wurde.
+      - "EMBED_DIM=${EMBED_DIM:-}"
     volumes:
-      # Quellen read-only, Index beschreibbar.
-      - "../data/documents:/data/documents:ro"
-      - "../data/notes:/data/notes:ro"
-      - "../data/lance:/data/lance"
+      # Nur der Index (rsync-Ziel, read-only) und der Modell-Cache.
+      - "../data/lance:/data/lance:ro"
       - "./model-cache:/cache"
     labels:
       - "traefik.enable=true"

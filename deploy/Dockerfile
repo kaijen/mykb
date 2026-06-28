@@ -1,5 +1,5 @@
-# MCP-Server-Image (CPU-Default; für GPU-Betrieb ein CUDA-Basisimage wählen
-# und im Compose das nvidia-Runtime/Device aktivieren).
+# VPS-Image (Abfrage-Seite): CPU-only, schlank. Für die GPU-Erstellen-Seite
+# auf dem Laptop dient stattdessen deploy/Dockerfile.cuda.
 FROM python:3.11-slim
 
 # Keine .pyc, ungepufferte Logs (strukturiert über structlog).
@@ -9,9 +9,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Abhängigkeiten zuerst (besseres Layer-Caching).
+# Abhängigkeiten zuerst (besseres Layer-Caching). CPU-Torch zuerst, damit nicht
+# die großen CUDA-Wheels gezogen werden (der VPS rechnet auf CPU).
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir -r requirements.txt
 
 COPY mykb/ mykb/
 COPY scripts/ scripts/
