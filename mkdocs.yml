@@ -1,0 +1,70 @@
+site_name: mykb — Literatur-RAG
+site_description: >-
+  Selbst gehostete RAG-Pipeline für Information-Security- und
+  Risikomanagement-Literatur, durchsuchbar über einen MCP-Server.
+site_author: Kai Jendrian
+# Wird über GitHub Pages veröffentlicht.
+site_url: https://kaijen.github.io/mykb/
+
+repo_name: kaijen/mykb
+repo_url: https://github.com/kaijen/mykb
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: de
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - content.code.copy
+    - content.action.edit
+    - search.suggest
+    - search.highlight
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Auf dunkles Design umschalten
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Auf helles Design umschalten
+
+extra:
+  # Versionsauswahl für die mike-Versionierung.
+  version:
+    provider: mike
+    default: latest
+
+plugins:
+  - search:
+      lang: de
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.details
+
+nav:
+  - Überblick: index.md
+  - Installation: installation.md
+  - Indexierung: indexierung.md
+  - MCP-Server: mcp-server.md
+  - Konfiguration: konfiguration.md
+  - Deployment: deployment.md
+  - Architektur & Modelle: architektur.md

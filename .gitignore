@@ -36,6 +36,9 @@ deploy/authelia/users_database.yml
 *.pem
 *.key
 
+# MkDocs-Build
+site/
+
 # Logs
 *.log
 
