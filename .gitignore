@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Tooling-Caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Modelle / Caches (werden zur Laufzeit geladen, nicht versioniert)
+.cache/
+*.safetensors
+*.gguf
+
+# Quelldokumente und generierter Index gehören NICHT ins Repo.
+# Sie können vertraulich sein (siehe CLAUDE.md, Abschnitt Sicherheit).
+data/literatur/**
+data/lance/**
+# Verzeichnis-Platzhalter bleiben erhalten:
+!data/literatur/standards/.gitkeep
+!data/literatur/research/.gitkeep
+!data/lance/.gitkeep
+
+# Secrets / lokale Konfiguration
+.env
+.env.local
+deploy/authelia/secrets/
+deploy/authelia/users_database.yml
+*.pem
+*.key
+
+# MkDocs-Build
+site/
+
+# Logs
+*.log
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/

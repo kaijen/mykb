@@ -1,0 +1,15 @@
+# Embedding / Vektor-DB
+sentence-transformers>=3.3.0
+lancedb>=0.15.0
+torch>=2.4.0
+
+# Dokument-Extraktion
+pypdf>=5.1.0
+
+# Logging
+structlog>=24.4.0
+
+# MCP-Server (für server/server.py)
+mcp>=1.2.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0

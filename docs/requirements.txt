@@ -1,0 +1,3 @@
+# Abhängigkeiten zum Bauen der Dokumentation (nicht für die Laufzeit der App).
+mkdocs-material>=9.5.0
+mike>=2.1.0

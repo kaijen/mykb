@@ -1,0 +1,53 @@
+# Authelia-Konfiguration (GERÜST). Kopieren nach configuration.yml und anpassen.
+# configuration.yml und users_database.yml sind in .gitignore — keine Secrets
+# ins Repo. Echte Secrets via Docker Secrets / Environment.
+#
+# Vollständige Referenz: https://www.authelia.com/configuration/
+
+server:
+  address: "tcp://0.0.0.0:9091"
+
+log:
+  level: info
+  format: json   # passt zum structlog-JSON des MCP-Servers
+
+# In Produktion durch zufällige Werte aus Docker Secrets ersetzen.
+identity_validation:
+  reset_password:
+    jwt_secret: "CHANGE_ME"   # -> Secret/Env
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml   # via users_database.example.yml anlegen
+
+access_control:
+  default_policy: deny
+  rules:
+    # MCP-Endpoint: Zugriff nur mit 2FA.
+    - domain: "rag.example.com"   # -> auf DOMAIN anpassen
+      policy: two_factor
+
+session:
+  name: authelia_session
+  secret: "CHANGE_ME"            # -> Secret/Env
+  cookies:
+    - domain: "example.com"      # -> Basis-Domain
+      authelia_url: "https://auth.example.com"
+      expiration: 1h
+      inactivity: 15m
+
+# Schutz gegen Brute-Force (Rate Limiting, siehe CLAUDE.md Sicherheit).
+regulation:
+  max_retries: 3
+  find_time: 2m
+  ban_time: 10m
+
+storage:
+  encryption_key: "CHANGE_ME"   # -> Secret/Env
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  # Für Tests; in Produktion SMTP konfigurieren.
+  filesystem:
+    filename: /config/notification.txt

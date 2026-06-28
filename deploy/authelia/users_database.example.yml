@@ -1,0 +1,14 @@
+# Beispiel-Benutzerdatenbank für Authelia (file-Backend).
+# Kopieren nach users_database.yml (in .gitignore) und anpassen.
+#
+# Passwort-Hash erzeugen (argon2):
+#   docker run --rm authelia/authelia:4.38 authelia crypto hash generate argon2 --password 'DEIN_PASSWORT'
+
+users:
+  beispiel:
+    displayname: "Beispiel Nutzer"
+    # Platzhalter — durch echten argon2-Hash ersetzen, NIE Klartext.
+    password: "$argon2id$v=19$m=65536,t=3,p=4$CHANGE_ME"
+    email: nutzer@example.com
+    groups:
+      - admins
