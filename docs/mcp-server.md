@@ -40,6 +40,7 @@ Domain (mit TLS und Authelia davor, siehe [Deployment](deployment.md)).
 | `find_related(uri, limit?)` | semantisch verwandte Inhalte zu einem Element |
 | `recent_items(limit?, source_types?)` | zuletzt hinzugefügte Elemente (Timeline) |
 | `get_document_context(uri, chunk_index, window?)` | benachbarte Chunks einer Fundstelle |
+| `kb_status()` | Bestände, Link-Status, Queue-Rückstand, letzter Lauf/Sync |
 
 ## Prompts (Patterns)
 

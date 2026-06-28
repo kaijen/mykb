@@ -134,8 +134,12 @@ Einen Kurzbefehl/Share-Sheet-Eintrag anlegen, der den geteilten Inhalt per
 | Methode | Pfad | Zweck |
 |---|---|---|
 | `GET` | `/health` | Statusprüfung |
-| `POST` | `/capture/url` | URL an Linkwarden übergeben (JSON: `url`, `tags`, `note`, `collection`) |
-| `POST` | `/capture/file` | Datei in die Inbox (Multipart: `file`, `kind`, `collection`) |
+| `GET` | `/status` | Bestände, Queue-Rückstand, letzter Lauf/Sync (JSON; Basis für die PWA) |
+| `POST` | `/capture/url` | URL übergeben (JSON: `url`, `tags`, `note`, `collection`) |
+| `POST` | `/capture/file` | Datei übergeben (Multipart: `file`, `kind`, `collection`) |
+
+Dieselben Kennzahlen liefert die CLI `python -m mykb status` und das MCP-Tool
+`kb_status` (in Claude).
 
 Hochgeladene Dateinamen werden entschärft (kein Pfad-Traversal); übergebene
 Links landen via Linkwarden-API als Bookmark und kommen beim nächsten

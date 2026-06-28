@@ -12,11 +12,16 @@ from __future__ import annotations
 
 import subprocess
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import structlog
 
 from .config import Config
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 logger = structlog.get_logger()
 
@@ -157,9 +162,14 @@ def watch(cfg: Config) -> None:
             # nächsten Zyklus erneut auslösen (process ist idempotent).
             trigger.clear()
             logger.info("process_run", reason=reason)
+            from . import status
+
             try:
                 process_once(cfg, ingestor)
+                status.write_state(cfg, last_process=_now_iso())
                 _rsync(cfg)
+                if cfg.vps_ssh_target:
+                    status.write_state(cfg, last_sync=_now_iso())
             except Exception as exc:  # defensiv: der Watcher darf nicht sterben
                 logger.error("process_failed", error=str(exc)[:200])
             last_run = time.time()

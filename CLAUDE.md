@@ -178,6 +178,7 @@ python -m mykb collections --apply
 python -m mykb capture                         # 127.0.0.1:8765 (tailscale serve davor)
 python -m mykb watch                           # Trigger-gesteuert verarbeiten + Sync
 python -m mykb process                         # einmaliger Lauf (systemd/cron)
+python -m mykb status                          # Bestände, Queue-Rückstand, letzter Lauf
 
 # Optionen analog zur Indexierung
 EMBED_DIM=512 python -m mykb index --source all
@@ -213,6 +214,7 @@ python server/server.py
    (Timeline).
 5. `get_document_context(uri, chunk_index, window?)` — benachbarte Chunks einer
    Fundstelle für mehr Kontext.
+6. `kb_status()` — Bestände, Link-Status, Queue-Rückstand, letzter Lauf/Sync.
 
 Query-Embedding nutzt den Qwen3-Instruction-Prefix (asymmetrisch, siehe
 `mykb/embedder.py`).

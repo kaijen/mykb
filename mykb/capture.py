@@ -47,6 +47,13 @@ def create_app(cfg: Config):
     def health() -> dict:
         return {"status": "ok"}
 
+    @app.get("/status")
+    def status() -> dict:
+        """Bestände, Queue-Rückstand, letzte Verarbeitung/Sync (für die PWA)."""
+        from .status import collect_status
+
+        return collect_status(cfg)
+
     @app.post("/capture/url", status_code=202)
     def capture_url(
         item: UrlIn,

@@ -91,7 +91,10 @@ services:
       - "CAPTURE_HOST=0.0.0.0"
       - "CAPTURE_PORT=8765"
       - "QUEUE_DIR=/queue"
+      # Für GET /status (Bestände); Index ist hier read-only vorhanden.
+      - "LANCE_DB_PATH=/data/lance"
     ports:
       - "127.0.0.1:8765:8765"
     volumes:
       - "../data/queue:/queue"
+      - "../data/lance:/data/lance:ro"
