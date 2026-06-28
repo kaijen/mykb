@@ -12,6 +12,7 @@ Quellordner ablegen bzw. Link an Linkwarden), die schwere GPU-Arbeit
 # Ausnahme von der Projektkonvention: KEIN `from __future__ import annotations`.
 # FastAPI kann mit PEP-563-Stringannotationen ``UploadFile`` in
 # Endpoint-Signaturen nicht auflösen. Python 3.11 versteht ``str | None`` nativ.
+import os
 from pathlib import Path
 
 import structlog
@@ -65,7 +66,11 @@ def create_app(cfg: Config):
             from . import queue
 
             qid = queue.enqueue_url(
-                cfg, item.url, tags=item.tags, note=item.note or "", collection=item.collection or ""
+                cfg,
+                item.url,
+                tags=item.tags,
+                note=item.note or "",
+                collection=item.collection or "",
             )
             logger.info("captured_url", who=who, url=item.url[:80], queued=qid)
             return {"status": "queued", "target": "queue", "id": qid}
@@ -74,7 +79,9 @@ def create_app(cfg: Config):
 
         lw = Linkwarden(cfg)
         if not lw.available():
-            raise HTTPException(503, "Linkwarden nicht konfiguriert (LINKWARDEN_URL/TOKEN)")
+            raise HTTPException(
+                503, "Linkwarden nicht konfiguriert (LINKWARDEN_URL/TOKEN)"
+            )
         try:
             lw.create_link(
                 item.url,
@@ -84,7 +91,7 @@ def create_app(cfg: Config):
             )
         except Exception as exc:  # defensiv: Detail nicht nach außen geben
             logger.error("capture_url_failed", error=str(exc)[:200])
-            raise HTTPException(502, "Linkwarden-Aufruf fehlgeschlagen")
+            raise HTTPException(502, "Linkwarden-Aufruf fehlgeschlagen") from exc
 
         trigger.fire()  # zeitnahe Verarbeitung durch den Watcher anstoßen
         logger.info("captured_url", who=who, url=item.url[:80])
@@ -114,8 +121,12 @@ def create_app(cfg: Config):
         target_dir = root / collection if collection else root
         target_dir.mkdir(parents=True, exist_ok=True)
 
+        # Atomar schreiben: temp + os.replace, damit der Watcher nie eine
+        # partielle Datei indexiert (er liest dieselben Quellordner).
         dest = target_dir / _safe_name(file.filename)
-        dest.write_bytes(data)
+        tmp = dest.with_name(dest.name + ".tmp")
+        tmp.write_bytes(data)
+        os.replace(tmp, dest)
 
         trigger.fire()  # zeitnahe Verarbeitung durch den Watcher anstoßen
         logger.info("captured_file", who=who, path=str(dest), bytes=len(data))

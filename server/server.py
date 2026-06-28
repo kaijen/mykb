@@ -66,12 +66,14 @@ class _Reranker:
         if not rows:
             return rows
         scores = self.model.predict([(query, r["content"]) for r in rows])
-        ranked = sorted(zip(rows, scores), key=lambda rs: rs[1], reverse=True)
+        ranked = sorted(
+            zip(rows, scores, strict=True), key=lambda rs: rs[1], reverse=True
+        )
         return [r for r, _ in ranked]
 
 
 @lru_cache(maxsize=1)
-def get_reranker() -> "_Reranker | None":
+def get_reranker() -> _Reranker | None:
     if not CFG.rerank_model:
         return None
     try:

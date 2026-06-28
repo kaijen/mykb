@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import subprocess
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import structlog
@@ -21,7 +21,7 @@ from .config import Config
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 logger = structlog.get_logger()
 
@@ -102,7 +102,8 @@ def pull_and_drain(cfg: Config) -> int:
         cmd = [
             "rsync",
             "-az",
-            "--remove-source-files",  # nach erfolgreicher Übertragung an der Quelle löschen
+            # nach erfolgreicher Übertragung an der Quelle löschen
+            "--remove-source-files",
             "-e",
             _ssh_opt(cfg),
             cfg.queue_pull_source,
@@ -146,7 +147,9 @@ def watch(cfg: Config) -> None:
         now = time.time()
 
         # Queue vom immer-erreichbaren Knoten ziehen/drainen (eigener Takt).
-        if cfg.queue_pull_source and (last_pull is None or now - last_pull >= cfg.queue_poll):
+        if cfg.queue_pull_source and (
+            last_pull is None or now - last_pull >= cfg.queue_poll
+        ):
             try:
                 if pull_and_drain(cfg) > 0:
                     trigger.fire()  # gedrainte Einträge wie eine Übergabe behandeln
@@ -154,13 +157,17 @@ def watch(cfg: Config) -> None:
                 logger.error("queue_drain_failed", error=str(exc)[:200])
             last_pull = now
 
+        trigger_mtime = trigger.mtime()
         run, reason = should_process(
-            now, trigger.mtime(), last_run, cfg.process_debounce, cfg.process_interval
+            now, trigger_mtime, last_run, cfg.process_debounce, cfg.process_interval
         )
         if run:
-            # Vor dem Lauf löschen, damit Übergaben während der Verarbeitung den
-            # nächsten Zyklus erneut auslösen (process ist idempotent).
-            trigger.clear()
+            # Compare-and-clear: nur löschen, wenn der Trigger seit der Prüfung
+            # nicht erneut gefeuert wurde — sonst ginge eine Übergabe verloren,
+            # die genau in dieses Fenster fällt. Eine neuere Übergabe löst dann
+            # im nächsten Zyklus aus. (process ist idempotent.)
+            if trigger.mtime() == trigger_mtime:
+                trigger.clear()
             logger.info("process_run", reason=reason)
             from . import status
 

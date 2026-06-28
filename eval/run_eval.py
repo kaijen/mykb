@@ -112,7 +112,14 @@ def build_searcher(cfg, rerank: bool):
         cands = store.search(table, qvec, cfg.top_k, where=where)
         if reranker is not None and cands:
             scores = reranker.predict([(query, c["content"]) for c in cands])
-            cands = [c for c, _ in sorted(zip(cands, scores), key=lambda cs: cs[1], reverse=True)]
+            cands = [
+                c
+                for c, _ in sorted(
+                    zip(cands, scores, strict=True),
+                    key=lambda cs: cs[1],
+                    reverse=True,
+                )
+            ]
         return cands
 
     return search
@@ -121,7 +128,9 @@ def build_searcher(cfg, rerank: bool):
 def main() -> None:
     parser = argparse.ArgumentParser(description="Suchqualität evaluieren (#6)")
     parser.add_argument("--queries", required=True, help="YAML mit query/expected/...")
-    parser.add_argument("--k", type=int, default=None, help="Top-k (Default SEARCH_RETURN_K)")
+    parser.add_argument(
+        "--k", type=int, default=None, help="Top-k (Default SEARCH_RETURN_K)"
+    )
     parser.add_argument("--rerank", action="store_true", help="Reranker einschalten")
     parser.add_argument("--json", help="Ergebnis zusätzlich als JSON hierhin schreiben")
     args = parser.parse_args()
@@ -156,7 +165,11 @@ def main() -> None:
 
     if args.json:
         Path(args.json).write_text(
-            json.dumps({"summary": summary, "per_query": rows}, ensure_ascii=False, indent=2),
+            json.dumps(
+                {"summary": summary, "per_query": rows},
+                ensure_ascii=False,
+                indent=2,
+            ),
             encoding="utf-8",
         )
 

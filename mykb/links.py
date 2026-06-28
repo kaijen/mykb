@@ -15,7 +15,7 @@ sind in :class:`Linkwarden` gebündelt und dort ggf. anzupassen.
 from __future__ import annotations
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
@@ -27,7 +27,7 @@ logger = structlog.get_logger()
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 class Linkwarden:
@@ -47,9 +47,11 @@ class Linkwarden:
 
         headers = {"Authorization": f"Bearer {self.token}"}
         out: list[dict] = []
+        seen_ids: set = set()
         cursor: int | None = None
         with httpx.Client(timeout=self.cfg.http_timeout, headers=headers) as client:
-            while True:
+            # Harte Obergrenze als Sicherung gegen Fehlverhalten der Paginierung.
+            for _ in range(1000):
                 params: dict[str, int] = {}
                 if cursor is not None:
                     params["cursor"] = cursor
@@ -58,7 +60,13 @@ class Linkwarden:
                 batch = resp.json().get("response", [])
                 if not batch:
                     break
-                out.extend(batch)
+                # Nur neue Einträge übernehmen; bringt ein Batch keine neuen ids,
+                # macht die Paginierung keinen Fortschritt -> abbrechen.
+                fresh = [it for it in batch if it.get("id") not in seen_ids]
+                if not fresh:
+                    break
+                out.extend(fresh)
+                seen_ids.update(it.get("id") for it in fresh)
                 last_id = batch[-1].get("id")
                 if last_id is None or last_id == cursor:
                     break
@@ -121,6 +129,9 @@ def sync_from_linkwarden(cfg: Config, ingestor: Ingestor | None = None) -> int:
 
     ing = ingestor or Ingestor(cfg)  # teilt Embedder + documents-Tabelle
     links_table = store.ensure_links(ing.db)
+    # Bestehende Liveness-Felder bewahren — ein Sync darf den von check_links()
+    # geschriebenen Status nicht verlieren (Invariante aus CLAUDE.md).
+    existing = store.links_by_url(links_table)
 
     items = lw.fetch_links()
     count = 0
@@ -151,21 +162,25 @@ def sync_from_linkwarden(cfg: Config, ingestor: Ingestor | None = None) -> int:
                 content_hash=content_hash,
             )
 
+        prev = existing.get(url, {})
         store.upsert_link(
             links_table,
             {
                 "id": extract.sha256_text(url)[:16],
                 "url": url,
+                # Metadaten aus Linkwarden aktualisieren …
                 "title": item["title"],
                 "tags": item["tags"],
                 "note": item["note"],
                 "added_at": item["added_at"],
-                "last_checked": "",
-                "status": "unchecked",
-                "http_status": 0,
-                "final_url": "",
-                "last_ok_at": "",
                 "content_hash": content_hash,
+                # … Liveness-Felder aus dem bestehenden Datensatz übernehmen
+                # (neue Links bleiben „unchecked").
+                "last_checked": prev.get("last_checked", ""),
+                "status": prev.get("status", "unchecked"),
+                "http_status": prev.get("http_status", 0),
+                "final_url": prev.get("final_url", ""),
+                "last_ok_at": prev.get("last_ok_at", ""),
             },
         )
         count += 1

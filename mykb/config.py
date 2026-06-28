@@ -50,7 +50,10 @@ class Config:
     capture_mode: str = os.getenv("CAPTURE_MODE", "direct")
 
     # --- Queue (Puffer für Laptop-Ausfall) ---
-    queue_dir: str = os.getenv("QUEUE_DIR", os.path.join(os.getenv("STATE_DIR", "./data/state"), "queue"))
+    queue_dir: str = os.getenv(
+        "QUEUE_DIR",
+        os.path.join(os.getenv("STATE_DIR", "./data/state"), "queue"),
+    )
     # rsync-Quelle, von der der Laptop die Queue zieht (leer = kein Pull).
     queue_pull_source: str = os.getenv("QUEUE_PULL_SOURCE", "")
     # Wie oft der Watcher die entfernte Queue zieht (Sekunden).

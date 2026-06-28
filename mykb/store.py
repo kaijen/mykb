@@ -10,7 +10,7 @@ from __future__ import annotations
 import structlog
 
 from . import schema
-from .config import Config, DOCS_TABLE, LINKS_TABLE
+from .config import DOCS_TABLE, LINKS_TABLE, Config
 
 logger = structlog.get_logger()
 
