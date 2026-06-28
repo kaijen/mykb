@@ -25,10 +25,42 @@ flowchart LR
     end
 ```
 
-!!! info "Der Laptop muss online sein"
-    Tailscale stellt die Verbindung her, **weckt** den Laptop aber nicht. Ist er
-    aus/schlafend, schlägt die Übergabe fehl (per Wake-on-LAN über einen anderen
-    Tailnet-Knoten ließe sich das ergänzen).
+!!! info "Direkt-Modus: der Laptop muss online sein"
+    Im oben gezeigten `direct`-Modus läuft der Annahmepunkt auf dem Laptop. Ist er
+    aus/schlafend, schlägt die Übergabe fehl. Dagegen hilft der **Queue-Modus**.
+
+## Ausfallsicherheit: Queue auf dem VPS
+
+Damit nichts verloren geht, wenn der Laptop aus ist, läuft der Annahmepunkt als
+**Queue-Intake** auf dem **immer-erreichbaren VPS** (im Tailnet). Übergaben werden
+dort durabel eingereiht; der Laptop **zieht** die Queue per rsync und verarbeitet
+sie, sobald er wieder läuft.
+
+```mermaid
+flowchart LR
+    PH[Handy/Rechner] -->|Tailscale, immer erreichbar| CAPV[capture · queue-Modus<br/>VPS]
+    CAPV --> Q[(Queue<br/>data/queue)]
+    Q -. rsync pull (laptop online) .-> W[mykb watch<br/>Laptop]
+    W -->|drain| INB[(Inbox / Linkwarden)]
+    INB --> PROC[process + embed]
+    PROC ==>|rsync| LNV[(lance · VPS)]
+```
+
+- **VPS** (`docker-compose.yml`, Service `capture` mit `CAPTURE_MODE=queue`):
+  nimmt `/capture/url` und `/capture/file` entgegen und reiht sie durabel ein
+  (atomar; ein Eintrag = `<id>.json` plus ggf. `<id>.bin`).
+- **Laptop** (`scheduler`/`mykb watch`): zieht die Queue alle `QUEUE_POLL`
+  Sekunden per `rsync --remove-source-files` (entfernt sie an der Quelle),
+  `drain`t sie (Datei → Inbox, Link → Linkwarden) und stößt die Verarbeitung an.
+
+Konfiguration: VPS-Intake unter `tailscale serve --bg 8765` veröffentlichen;
+am Laptop `QUEUE_PULL_SOURCE=user@vps:/srv/mykb/data/queue/` setzen. Manuell
+leeren geht mit `python -m mykb drain`.
+
+!!! note "Was die Queue (nicht) löst"
+    Übergaben gehen nicht verloren und der Client bekommt nie einen Fehler. Die
+    **Verarbeitung** (Embedding) passiert weiterhin erst, wenn der Laptop läuft —
+    die GPU sitzt dort. Die Queue entkoppelt also Annahme von Verarbeitung.
 
 ## Dienst starten und im Tailnet veröffentlichen
 

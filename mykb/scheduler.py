@@ -60,6 +60,10 @@ def should_process(
     return False, "idle"
 
 
+def _ssh_opt(cfg: Config) -> str:
+    return f"ssh -i {cfg.ssh_key} -o StrictHostKeyChecking=accept-new"
+
+
 def _rsync(cfg: Config) -> None:
     if not cfg.vps_ssh_target:
         return
@@ -68,13 +72,42 @@ def _rsync(cfg: Config) -> None:
         "-az",
         "--delete",
         "-e",
-        f"ssh -i {cfg.ssh_key} -o StrictHostKeyChecking=accept-new",
+        _ssh_opt(cfg),
         f"{cfg.db_path}/",
         cfg.vps_ssh_target,
     ]
     logger.info("sync_start", target=cfg.vps_ssh_target)
     subprocess.run(cmd, check=True)
     logger.info("sync_done")
+
+
+def pull_and_drain(cfg: Config) -> int:
+    """Entfernte Queue ziehen (rsync, an der Quelle entfernen) und lokal drainen.
+
+    Gibt die Anzahl übernommener Einträge zurück. Puffer für Laptop-Ausfall:
+    Übergaben sammeln sich auf dem immer-erreichbaren Knoten und werden hier
+    übernommen, sobald der Laptop wieder läuft.
+    """
+    from pathlib import Path
+
+    from . import queue
+
+    if cfg.queue_pull_source:
+        Path(cfg.queue_dir).mkdir(parents=True, exist_ok=True)
+        cmd = [
+            "rsync",
+            "-az",
+            "--remove-source-files",  # nach erfolgreicher Übertragung an der Quelle löschen
+            "-e",
+            _ssh_opt(cfg),
+            cfg.queue_pull_source,
+            f"{cfg.queue_dir}/",
+        ]
+        try:
+            subprocess.run(cmd, check=True)
+        except Exception as exc:  # VPS evtl. kurz nicht erreichbar
+            logger.warning("queue_pull_failed", error=str(exc)[:200])
+    return queue.drain(cfg)
 
 
 def process_once(cfg: Config, ingestor) -> int:
@@ -95,15 +128,27 @@ def watch(cfg: Config) -> None:
     trigger = Trigger(cfg.trigger_path)
     ingestor = Ingestor(cfg)  # Embedder einmal laden, über alle Läufe wiederverwenden
     last_run: float | None = None
+    last_pull: float | None = None
 
     logger.info(
         "watch_start",
         trigger=cfg.trigger_path,
         debounce=cfg.process_debounce,
         interval=cfg.process_interval,
+        queue=bool(cfg.queue_pull_source),
     )
     while True:
         now = time.time()
+
+        # Queue vom immer-erreichbaren Knoten ziehen/drainen (eigener Takt).
+        if cfg.queue_pull_source and (last_pull is None or now - last_pull >= cfg.queue_poll):
+            try:
+                if pull_and_drain(cfg) > 0:
+                    trigger.fire()  # gedrainte Einträge wie eine Übergabe behandeln
+            except Exception as exc:  # defensiv: Watcher darf nicht sterben
+                logger.error("queue_drain_failed", error=str(exc)[:200])
+            last_pull = now
+
         run, reason = should_process(
             now, trigger.mtime(), last_run, cfg.process_debounce, cfg.process_interval
         )

@@ -78,6 +78,14 @@ def cmd_watch(args, cfg) -> None:
     watch(cfg)
 
 
+def cmd_drain(args, cfg) -> None:
+    """Queue (Puffer) ziehen und in Inbox/Linkwarden übernehmen."""
+    from .scheduler import pull_and_drain
+
+    n = pull_and_drain(cfg)
+    logger.info("drained", items=n)
+
+
 def cmd_process(args, cfg) -> None:
     """Inbox verarbeiten: lokale Quellen indexieren und Links aus Linkwarden ziehen."""
     from . import links
@@ -144,6 +152,11 @@ def build_parser() -> argparse.ArgumentParser:
         "watch", help="Ereignisgesteuert verarbeiten (Capture-Trigger + Intervall, dann Sync)"
     )
     p_watch.set_defaults(func=cmd_watch)
+
+    p_drain = sub.add_parser(
+        "drain", help="Queue ziehen + in Inbox/Linkwarden übernehmen (Puffer leeren)"
+    )
+    p_drain.set_defaults(func=cmd_drain)
 
     p_coll = sub.add_parser(
         "collections", help="Themen-Cluster vorschlagen (Auto-Sammlungen)"

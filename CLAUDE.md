@@ -34,7 +34,9 @@ Bewusste Trennung der beiden Seiten:
   veröffentlicht via `tailscale serve` (nur Tailnet, kein Token). Verarbeitung
   ereignisgesteuert: Capture setzt einen Trigger, `mykb watch` verarbeitet
   debounced und spiegelt direkt danach per rsync zum VPS (`mykb process` bleibt
-  als Einzellauf für systemd/cron).
+  als Einzellauf für systemd/cron). Für **Ausfallsicherheit** (Laptop aus) läuft
+  ein Capture-Intake im **Queue-Modus** auf dem VPS; der Laptop zieht die Queue
+  (rsync) und verarbeitet sie (`mykb drain`/im Watcher), sobald er online ist.
 - **Abfragen (VPS, CPU):** Der MCP-Server beantwortet Queries. Er braucht
   denselben Embedder für das **Query-Embedding** (asymmetrisch). Qwen3-0.6B auf
   CPU ist für einzelne Queries schnell genug.
@@ -107,8 +109,10 @@ mykb/
 │   ├── enrich.py              # KI-Anreicherung (Ollama): summary + Auto-Tags
 │   ├── collections.py         # Auto-Sammlungen (Clustering)
 │   ├── patterns.py            # kuratierte Analyse-Prompts (MCP-Prompts)
-│   ├── capture.py             # Capture-Dienst (Erfassen von unterwegs)
-│   └── __main__.py            # CLI: index, web, links, process, capture ...
+│   ├── capture.py             # Capture-Dienst (direct/queue)
+│   ├── queue.py               # durable Datei-Queue (Puffer für Laptop-Ausfall)
+│   ├── scheduler.py           # mykb watch: Trigger/Intervall, drain, Sync
+│   └── __main__.py            # CLI: index, web, links, process, watch, drain ...
 ├── server/
 │   └── server.py              # MCP-Server (Abfrageseite, VPS)
 ├── deploy/                    # Docker, Traefik, Authelia
@@ -189,6 +193,7 @@ python server/server.py
 `EMBED_BATCH_SIZE`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `EMBED_DIM`,
 `MCP_HOST`, `MCP_PORT`, `CAPTURE_HOST`, `CAPTURE_PORT`,
 `STATE_DIR`, `PROCESS_DEBOUNCE`, `PROCESS_INTERVAL`, `WATCH_POLL`,
+`CAPTURE_MODE`, `QUEUE_DIR`, `QUEUE_PULL_SOURCE`, `QUEUE_POLL`,
 `VPS_SSH_TARGET`, `SSH_KEY`,
 `SEARCH_TOP_K`, `SEARCH_RETURN_K`,
 `RERANK_MODEL`, `RERANK_DEVICE`,

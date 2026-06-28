@@ -75,3 +75,23 @@ services:
       - "traefik.http.routers.mcp.tls.certresolver=le"
       - "traefik.http.routers.mcp.middlewares=authelia@docker"
       - "traefik.http.services.mcp.loadbalancer.server.port=8000"
+
+  # Immer-erreichbarer Queue-Intake (Puffer für Laptop-Ausfall). Nimmt Übergaben
+  # entgegen und reiht sie durabel ein; der Laptop zieht die Queue per rsync
+  # (QUEUE_PULL_SOURCE -> diese ../data/queue) und verarbeitet sie.
+  # Bewusst NICHT über Traefik/Authelia, sondern im Tailnet: 'tailscale serve --bg 8765'.
+  capture:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "mykb", "capture"]
+    environment:
+      - "CAPTURE_MODE=queue"
+      - "CAPTURE_HOST=0.0.0.0"
+      - "CAPTURE_PORT=8765"
+      - "QUEUE_DIR=/queue"
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - "../data/queue:/queue"
