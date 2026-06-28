@@ -57,12 +57,8 @@ def load_file(path: Path) -> Extracted | None:
     return None
 
 
-def html_to_text(html: str) -> tuple[str, str]:
-    """HTML auf Lesetext reduzieren. Liefert (text, title).
-
-    Bewusst permissiv (BeautifulSoup, MIT) statt trafilatura (GPLv3), passend
-    zur sonst Apache/MIT/BSD-Linie des Projekts.
-    """
+def _bs4_extract(html: str) -> tuple[str, str]:
+    """Einfacher Fallback: Boilerplate grob entfernen, Resttext nehmen."""
     from bs4 import BeautifulSoup
 
     soup = BeautifulSoup(html, "lxml")
@@ -79,3 +75,33 @@ def html_to_text(html: str) -> tuple[str, str]:
     lines = [ln.strip() for ln in raw.splitlines()]
     text = "\n".join(ln for ln in lines if ln)
     return text, title
+
+
+def html_to_text(html: str) -> tuple[str, str]:
+    """HTML auf Lesetext reduzieren. Liefert (text, title).
+
+    Bevorzugt trafilatura (deutlich bessere Hauptinhalts-Erkennung), mit
+    BeautifulSoup als Fallback. trafilatura ist GPLv3 — für den
+    selbst gehosteten Eigenbetrieb unkritisch.
+    """
+    try:
+        import trafilatura
+
+        text = trafilatura.extract(
+            html, include_comments=False, include_tables=True
+        )
+        if text and text.strip():
+            title = ""
+            try:
+                meta = trafilatura.extract_metadata(html)
+                if meta and meta.title:
+                    title = meta.title.strip()
+            except Exception:  # Metadaten optional
+                pass
+            if not title:
+                _, title = _bs4_extract(html)
+            return text, title
+    except Exception as exc:  # defensiv: Fallback bleibt
+        logger.warning("trafilatura_failed", error=str(exc))
+
+    return _bs4_extract(html)

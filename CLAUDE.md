@@ -58,8 +58,13 @@ Engpass, nicht der RAM. Daraus folgt die Arbeitsteilung:
 | Embedder (Qualität) | `boboliu/Qwen3-Embedding-4B-W4A16-G128` | Apache 2.0 | ~2,5 GB | bessere Treffer, dann Reranker auf CPU |
 | Reranker | `Alibaba-NLP/gte-multilingual-reranker-base` | Apache 2.0 | ~0,6 GB | kommerziell nutzbar, multilingual |
 
-Bewusst NICHT verwendet: `jinaai/jina-reranker-v2-base-multilingual`
-(cc-by-nc-4.0, non-commercial) und `all-MiniLM-L6-v2` (englisch only).
+Lizenzpolitik (gelockert): Für **selbst gehostete Tooling-Bibliotheken** sind
+auch Copyleft-Lizenzen (z. B. trafilatura, GPLv3) in Ordnung — kein Vertrieb,
+nur Eigenbetrieb. Bei **Modellen**, die in bezahlter Beratung Ergebnisse
+liefern, bleibt eine kommerziell nutzbare Lizenz die Voreinstellung; ein
+non-commercial Modell wie `jinaai/jina-reranker-v2-base-multilingual`
+(cc-by-nc-4.0) ist nur als optionale Alternative für rein private Nutzung
+gedacht. `all-MiniLM-L6-v2` bleibt ungenutzt (englisch only).
 
 Qwen3 ist asymmetrisch: Queries bekommen einen Instruction-Prefix, Passages
 nicht. Diese Logik steckt zentral in `mykb/embedder.py` und wird sowohl beim
@@ -69,7 +74,7 @@ Indexieren (Passages) als auch serverseitig (Query) genutzt.
 
 - Vektor-DB: LanceDB (serverless, lokale Dateien, keine Cloud)
 - Embeddings: sentence-transformers + Qwen3
-- Web-Extraktion: httpx + BeautifulSoup (permissive Lizenzen)
+- Web-Extraktion: httpx + trafilatura (Hauptinhalt), BeautifulSoup als Fallback
 - MCP-Server: FastMCP (Python), SSE-Transport für Remote-Zugriff
 - Container: Docker Compose
 - Reverse Proxy: Traefik (ACME/Let's Encrypt)
@@ -165,7 +170,9 @@ python server/server.py
    Suche über `documents`, optional gefiltert nach Quelltyp/Sammlung.
 2. `find_links(query, only_alive?, limit?)` — durchsucht Link-Snapshots und
    liefert Bookmark-Metadaten inkl. Erreichbarkeitsstatus.
-3. `get_document_context(uri, chunk_index, window?)` — benachbarte Chunks einer
+3. `find_related(uri, limit?)` — semantisch verwandte Inhalte zu einem Element
+   (fabric-Stil „associations"), zum Entdecken von Zusammenhängen.
+4. `get_document_context(uri, chunk_index, window?)` — benachbarte Chunks einer
    Fundstelle für mehr Kontext.
 
 Query-Embedding nutzt den Qwen3-Instruction-Prefix (asymmetrisch, siehe
@@ -184,6 +191,24 @@ Query-Embedding nutzt den Qwen3-Instruction-Prefix (asymmetrisch, siehe
 5. Link-Rot-Prüfung planmäßig ausführen (Cron/systemd-Timer) und Web-Snapshots
    periodisch auffrischen.
 6. Notizen-Quelle: optional Frontmatter/Tags aus Markdown übernehmen.
+
+### Fabric-inspirierte Ausbaustufen (siehe fabric.so)
+
+Leitidee von fabric.so: alles Gespeicherte wird inhaltlich „verstanden",
+automatisch verschlagwortet/verknüpft und per Bedeutung durchsuchbar. Übertragen
+auf mykb (lokaler LLM via Ollama, CPU — passt zur Hardware-Arbeitsteilung):
+
+- **KI-Anreicherung beim Ingest:** je Quelle eine kurze Zusammenfassung und
+  automatische Schlagworte erzeugen (neue Felder `summary`, auto-`tags`),
+  in Treffern mitliefern.
+- **Patterns (à la Daniel Miesslers „fabric"):** kuratierte Prompts
+  (`summarize`, `extract_wisdom`, `extract_claims`, `action_items`) als
+  MCP-Prompts bereitstellen, anwendbar auf eine `uri`.
+- **Verwandtes/Assoziationen:** umgesetzt via `find_related` (Vektor-Nachbarn);
+  ausbaubar zu themenbasierter Auto-Sammlung (Clustering).
+- **Breitere Capture-Quellen:** Readwise-Highlights, YouTube-Transkripte,
+  Bilder/Screenshots per OCR.
+- **Timeline:** Abruf zuletzt hinzugefügter Elemente über `indexed_at`.
 
 ## Konventionen
 

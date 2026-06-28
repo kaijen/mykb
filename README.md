@@ -104,6 +104,7 @@ Im MCP-Client als SSE-Endpoint eintragen:
 |---|---|
 | `search_knowledge(query, source_types?, collection?, limit?)` | semantische Suche über alle Quelltypen, optional gefiltert |
 | `find_links(query, only_alive?, limit?)` | Link-Snapshots durchsuchen + Bookmark-Status (Erreichbarkeit) |
+| `find_related(uri, limit?)` | semantisch verwandte Inhalte zu einem Element (fabric-Stil „associations") |
 | `get_document_context(uri, chunk_index, window?)` | benachbarte Chunks einer Fundstelle |
 
 ## Verzeichnisstruktur
@@ -130,7 +131,10 @@ Linkwarden).
 - [x] Inkrementelles Upsert über `uri` + `content_hash`
 - [x] Web-Ingestion (HTML → Text)
 - [x] Linkwarden-Connector + Link-Rot-Prüfung
-- [x] MCP-Server: `search_knowledge`, `find_links`, `get_document_context`
+- [x] Bessere Web-Extraktion (trafilatura, bs4-Fallback)
+- [x] MCP-Server: `search_knowledge`, `find_links`, `find_related`, `get_document_context`
+- [ ] KI-Anreicherung beim Ingest (Zusammenfassung + Auto-Tags via Ollama) — fabric-inspiriert
+- [ ] „Patterns" als MCP-Prompts (summarize, extract_wisdom, …)
 - [ ] Reranking-Stufe (gte-multilingual-reranker) produktiv
 - [ ] VPS-Sync festlegen (rsync vs. S3) und automatisieren
 - [ ] `deploy/` produktiv härten (alle Daten remote → Absicherung kritisch)

@@ -173,6 +173,24 @@ def find_links(
 
 
 @mcp.tool()
+def find_related(uri: str, limit: int | None = None) -> list[dict]:
+    """Semantisch verwandte Inhalte zu einem Element („associations").
+
+    Liefert andere Dokumente/Notizen/Links zum selben Thema — nützlich, um von
+    einer Fundstelle aus Zusammenhänge im Wissensspeicher zu entdecken.
+
+    Args:
+        uri: Quell-Kennung des Ausgangselements (Dateipfad oder URL).
+        limit: Anzahl verwandter Elemente (Default aus SEARCH_RETURN_K).
+    """
+    table = get_documents()
+    if table is None:
+        return []
+    rows = store.related(table, uri, CFG.top_k)
+    return rows[: (limit or CFG.return_k)]
+
+
+@mcp.tool()
 def get_document_context(uri: str, chunk_index: int, window: int = 2) -> list[dict]:
     """Liefert benachbarte Chunks einer Fundstelle für mehr Kontext.
 

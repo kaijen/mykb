@@ -85,6 +85,39 @@ def search(table, vector, top_k: int, where: str | None = None) -> list[dict]:
     return query.to_list()
 
 
+def vector_for_uri(table, uri: str):
+    """Repräsentativer Vektor einer Quelle (erster Chunk), sonst None."""
+    rows = (
+        table.search()
+        .where(f"uri = '{_sql_str(uri)}'")
+        .select(["vector"])
+        .limit(1)
+        .to_list()
+    )
+    return rows[0]["vector"] if rows else None
+
+
+def related(table, uri: str, top_k: int) -> list[dict]:
+    """Semantisch verwandte Inhalte zu ``uri`` (fabric-Stil „associations").
+
+    Sucht über den Vektor der Quelle, schließt die Quelle selbst aus und gibt
+    je Fundstelle (uri) nur den nächstgelegenen Chunk zurück.
+    """
+    vector = vector_for_uri(table, uri)
+    if vector is None:
+        return []
+    rows = search(table, vector, top_k, where=f"uri != '{_sql_str(uri)}'")
+    seen: set[str] = set()
+    out: list[dict] = []
+    for row in rows:
+        ruri = row.get("uri", "")
+        if ruri in seen:
+            continue
+        seen.add(ruri)
+        out.append(row)
+    return out
+
+
 # --- links -------------------------------------------------------------------
 
 def upsert_link(table, record: dict) -> None:
