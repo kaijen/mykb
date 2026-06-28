@@ -1,0 +1,21 @@
+# Eval-Queries für die Suchqualität (Issue #6).
+# Kopieren nach eval/queries.yaml und mit echten Anfragen füllen.
+#
+# Pro Eintrag:
+#   query:        die Suchanfrage (wie man sie Claude stellen würde)
+#   expected:     Liste von Teilstrings, die in uri/title/url/source eines
+#                 KORREKTEN Treffers vorkommen (z. B. Dateiname, Domain, Stichwort)
+#   source_types: optional auf document/note/web/link einschränken
+#
+# „expected" muss nichts Exaktes sein — Teilstring-Treffer genügt.
+
+- query: "Diabetes Typ 1 Therapie und Insulindosierung"
+  expected: ["diabetes", "dafne"]
+  source_types: ["link", "web"]
+
+- query: "ISO 27001 Annex A.8 Asset Management"
+  expected: ["27001", "asset"]
+  source_types: ["document"]
+
+- query: "Bayessche Methoden zur Risikoquantifizierung"
+  expected: ["bayes", "risk"]
