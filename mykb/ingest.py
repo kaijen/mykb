@@ -12,6 +12,7 @@ from . import extract, store, web
 from .chunking import chunk_text
 from .config import Config, DOC_SUFFIXES
 from .embedder import Embedder
+from .enrich import Enricher
 
 logger = structlog.get_logger()
 
@@ -26,6 +27,7 @@ class Ingestor:
     def __init__(self, cfg: Config, embedder: Embedder | None = None):
         self.cfg = cfg
         self.embedder = embedder or Embedder(cfg)
+        self.enricher = Enricher(cfg) if cfg.enrich else None
         self.db = store.connect(cfg)
         self.table = store.ensure_documents(self.db, self.embedder.dim)
 
@@ -39,6 +41,7 @@ class Ingestor:
         url: str,
         collection: str,
         tags: list[str],
+        summary: str,
         content_hash: str,
         pages: int,
         chunks: list[str],
@@ -58,6 +61,7 @@ class Ingestor:
                     "source": source,
                     "url": url,
                     "content": chunk,
+                    "summary": summary,
                     "uri": uri,
                     "content_hash": content_hash,
                     "chunk_index": i,
@@ -98,6 +102,19 @@ class Ingestor:
             store.upsert_by_uri(self.table, uri, [])  # evtl. alte Chunks entfernen
             return 0
 
+        # KI-Anreicherung (optional): Zusammenfassung + automatische Schlagworte.
+        summary = ""
+        if self.enricher is not None:
+            enr = self.enricher.enrich(text)
+            summary = enr.summary
+            if enr.tags:
+                # eigene Tags zuerst, Auto-Tags ergänzen (dedupliziert).
+                merged = list(tags)
+                for t in enr.tags:
+                    if t not in merged:
+                        merged.append(t)
+                tags = merged
+
         vectors = self.embedder.encode_passages(chunks)
         records = self._build_records(
             source_type=source_type,
@@ -107,6 +124,7 @@ class Ingestor:
             url=url,
             collection=collection,
             tags=tags,
+            summary=summary,
             content_hash=content_hash,
             pages=pages,
             chunks=chunks,

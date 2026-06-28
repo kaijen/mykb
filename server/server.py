@@ -27,6 +27,7 @@ from mcp.server.fastmcp import FastMCP
 from mykb import store
 from mykb.config import DOCS_TABLE, SOURCE_TYPES, load_config
 from mykb.embedder import Embedder
+from mykb.patterns import PATTERNS
 
 logger = structlog.get_logger()
 
@@ -191,6 +192,22 @@ def find_related(uri: str, limit: int | None = None) -> list[dict]:
 
 
 @mcp.tool()
+def recent_items(limit: int = 20, source_types: list[str] | None = None) -> list[dict]:
+    """Zuletzt hinzugefügte Elemente (Timeline) über alle Quelltypen.
+
+    Args:
+        limit: maximale Anzahl Elemente.
+        source_types: optional auf ``document``/``note``/``web``/``link``
+            einschränken.
+    """
+    table = get_documents()
+    if table is None:
+        return []
+    valid = [s for s in (source_types or []) if s in SOURCE_TYPES] or None
+    return store.recent_items(table, limit, valid)
+
+
+@mcp.tool()
 def get_document_context(uri: str, chunk_index: int, window: int = 2) -> list[dict]:
     """Liefert benachbarte Chunks einer Fundstelle für mehr Kontext.
 
@@ -205,6 +222,30 @@ def get_document_context(uri: str, chunk_index: int, window: int = 2) -> list[di
     lo = max(chunk_index - window, 0)
     hi = chunk_index + window
     return store.context_rows(table, uri, lo, hi)
+
+
+def _register_patterns() -> None:
+    """Kuratierte Patterns als MCP-Prompts bereitstellen.
+
+    Jeder Prompt lädt den Volltext der angegebenen ``uri`` und hängt ihn an die
+    Pattern-Anweisung an; Claude führt die Transformation aus.
+    """
+
+    def make(instruction: str):
+        def prompt(uri: str) -> str:
+            table = get_documents()
+            text = store.document_text(table, uri) if table is not None else ""
+            if not text:
+                return f"{instruction}\n\n(Kein Inhalt zu uri={uri!r} gefunden.)"
+            return f"{instruction}\n\n---\n{text}"
+
+        return prompt
+
+    for name, spec in PATTERNS.items():
+        mcp.prompt(name=name, description=spec["description"])(make(spec["instruction"]))
+
+
+_register_patterns()
 
 
 def main() -> None:

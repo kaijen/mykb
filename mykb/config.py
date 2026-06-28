@@ -51,6 +51,15 @@ class Config:
     )
     link_check_concurrency: int = int(os.getenv("LINK_CHECK_CONCURRENCY", "8"))
 
+    # --- KI-Anreicherung (lokaler LLM via Ollama, CPU) ---
+    # Aus, bis aktiv geschaltet (ENRICH=1 oder CLI --enrich). Greift nicht ins
+    # VRAM-Budget ein (läuft auf CPU/RAM, siehe Hardware-Arbeitsteilung).
+    enrich: bool = os.getenv("ENRICH", "0").lower() in {"1", "true", "yes"}
+    ollama_url: str = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    ollama_model: str = os.getenv("OLLAMA_MODEL", "llama3.2")
+    # Eingabetext für die Anreicherung kürzen (Prompt klein halten).
+    enrich_max_chars: int = int(os.getenv("ENRICH_MAX_CHARS", "6000"))
+
 
 def load_config() -> Config:
     return Config()

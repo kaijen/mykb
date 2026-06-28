@@ -109,8 +109,10 @@ mykb/
 ## LanceDB-Schema
 
 **Tabelle `documents`** (einheitlicher Inhaltsindex über alle Quelltypen):
-`id, source_type, collection, tags, title, source, url, content, uri,
+`id, source_type, collection, tags, title, source, url, content, summary, uri,
 content_hash, chunk_index, n_chunks, pages, indexed_at, vector`.
+
+- `summary`: optionale KI-Zusammenfassung (nur mit `--enrich`/`ENRICH=1`)
 
 - `source_type`: `document` | `note` | `web` | `link`
 - `collection`: frei belegbare Sammlung (z. B. aus Unterordner oder beim
@@ -127,8 +129,8 @@ final_url, last_ok_at, content_hash`.
   `documents` und ist damit semantisch durchsuchbar.
 
 Dimension stammt aus dem Modell (Qwen3-0.6B: 1024, optional per `EMBED_DIM`
-via Matryoshka gekürzt). Modellwechsel oder Dimensionsänderung = neu
-indexieren.
+via Matryoshka gekürzt). Modellwechsel, Dimensions- oder Schema-Änderung
+(z. B. neues Feld) = Tabelle neu aufbauen.
 
 ## Befehle
 
@@ -146,7 +148,14 @@ python -m mykb add-url https://example.org/artikel --tags infosec,lesen --note "
 # Linksammlung verwalten
 python -m mykb links list
 python -m mykb links list --broken
-python -m mykb links check --max-age-days 7   # Erreichbarkeit prüfen (Link-Rot)
+python -m mykb links check                     # Erreichbarkeit prüfen (Link-Rot)
+
+# KI-Anreicherung beim Ingest (Zusammenfassung + Auto-Tags via Ollama)
+python -m mykb index --source all --enrich
+
+# Auto-Sammlungen (Themen-Cluster vorschlagen / anwenden)
+python -m mykb collections --threshold 0.6
+python -m mykb collections --apply
 
 # Optionen analog zur Indexierung
 EMBED_DIM=512 python -m mykb index --source all
@@ -162,7 +171,9 @@ python server/server.py
 `EMBED_BATCH_SIZE`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `EMBED_DIM`,
 `MCP_HOST`, `MCP_PORT`, `SEARCH_TOP_K`, `SEARCH_RETURN_K`,
 `RERANK_MODEL`, `RERANK_DEVICE`,
-`HTTP_TIMEOUT`, `HTTP_USER_AGENT`, `LINK_CHECK_CONCURRENCY`.
+`HTTP_TIMEOUT`, `HTTP_USER_AGENT`, `LINK_CHECK_CONCURRENCY`,
+`ENRICH`, `OLLAMA_URL`, `OLLAMA_MODEL`, `ENRICH_MAX_CHARS`,
+`LINKWARDEN_URL`, `LINKWARDEN_TOKEN`.
 
 ## MCP-Tools
 
@@ -172,11 +183,20 @@ python server/server.py
    liefert Bookmark-Metadaten inkl. Erreichbarkeitsstatus.
 3. `find_related(uri, limit?)` — semantisch verwandte Inhalte zu einem Element
    (fabric-Stil „associations"), zum Entdecken von Zusammenhängen.
-4. `get_document_context(uri, chunk_index, window?)` — benachbarte Chunks einer
+4. `recent_items(limit?, source_types?)` — zuletzt hinzugefügte Elemente
+   (Timeline).
+5. `get_document_context(uri, chunk_index, window?)` — benachbarte Chunks einer
    Fundstelle für mehr Kontext.
 
 Query-Embedding nutzt den Qwen3-Instruction-Prefix (asymmetrisch, siehe
 `mykb/embedder.py`).
+
+## MCP-Prompts (Patterns)
+
+Kuratierte Analyse-Prompts (à la Daniel Miesslers „fabric"), in Claude auf eine
+`uri` anwendbar — der Server lädt den Volltext und hängt ihn an die Anweisung
+an: `summarize`, `extract_wisdom`, `extract_claims`, `action_items`
+(siehe `mykb/patterns.py`).
 
 ## Offene Punkte
 
@@ -198,17 +218,18 @@ Leitidee von fabric.so: alles Gespeicherte wird inhaltlich „verstanden",
 automatisch verschlagwortet/verknüpft und per Bedeutung durchsuchbar. Übertragen
 auf mykb (lokaler LLM via Ollama, CPU — passt zur Hardware-Arbeitsteilung):
 
-- **KI-Anreicherung beim Ingest:** je Quelle eine kurze Zusammenfassung und
-  automatische Schlagworte erzeugen (neue Felder `summary`, auto-`tags`),
-  in Treffern mitliefern.
-- **Patterns (à la Daniel Miesslers „fabric"):** kuratierte Prompts
-  (`summarize`, `extract_wisdom`, `extract_claims`, `action_items`) als
-  MCP-Prompts bereitstellen, anwendbar auf eine `uri`.
-- **Verwandtes/Assoziationen:** umgesetzt via `find_related` (Vektor-Nachbarn);
-  ausbaubar zu themenbasierter Auto-Sammlung (Clustering).
-- **Breitere Capture-Quellen:** Readwise-Highlights, YouTube-Transkripte,
-  Bilder/Screenshots per OCR.
-- **Timeline:** Abruf zuletzt hinzugefügter Elemente über `indexed_at`.
+- [x] **KI-Anreicherung beim Ingest:** Zusammenfassung + Auto-Tags via Ollama
+  (`mykb/enrich.py`, Feld `summary`, `--enrich`).
+- [x] **Patterns (à la Daniel Miesslers „fabric"):** `summarize`,
+  `extract_wisdom`, `extract_claims`, `action_items` als MCP-Prompts.
+- [x] **Verwandtes/Assoziationen:** `find_related` (Vektor-Nachbarn).
+- [x] **Auto-Sammlungen:** Themen-Clustering (`mykb/collections.py`,
+  `mykb collections [--apply]`).
+- [x] **Timeline:** `recent_items` über `indexed_at`.
+- [ ] **Breitere Capture-Quellen:** Readwise-Highlights, YouTube-Transkripte,
+  Bilder/Screenshots per OCR (bewusst zurückgestellt).
+- [ ] Auto-Sammlungen über bloßes Cosinus-Clustering hinaus (z. B. LLM-Benennung
+  der Cluster, k-Means).
 
 ## Konventionen
 

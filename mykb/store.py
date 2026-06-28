@@ -120,6 +120,63 @@ def related(table, uri: str, top_k: int) -> list[dict]:
 
 # --- links -------------------------------------------------------------------
 
+def document_text(table, uri: str) -> str:
+    """Volltext einer Quelle (alle Chunks nach chunk_index zusammengesetzt)."""
+    rows = (
+        table.search()
+        .where(f"uri = '{_sql_str(uri)}'")
+        .select(["content", "chunk_index"])
+        .limit(_MAX_SCAN)
+        .to_list()
+    )
+    rows.sort(key=lambda r: r.get("chunk_index", 0))
+    return "\n".join(r.get("content", "") for r in rows)
+
+
+def recent_items(table, limit: int, source_types: list[str] | None = None) -> list[dict]:
+    """Zuletzt indexierte Elemente (Timeline), je uri nur einmal."""
+    rows = (
+        table.search().select(list(schema.DOC_FIELDS)).limit(_MAX_SCAN).to_list()
+    )
+    if source_types:
+        rows = [r for r in rows if r.get("source_type") in source_types]
+    rows.sort(key=lambda r: r.get("indexed_at", ""), reverse=True)
+    seen: set[str] = set()
+    out: list[dict] = []
+    for r in rows:
+        u = r.get("uri", "")
+        if u in seen:
+            continue
+        seen.add(u)
+        out.append(r)
+        if len(out) >= limit:
+            break
+    return out
+
+
+def document_vectors(table) -> list[dict]:
+    """Pro Quelle ein repräsentativer Vektor (erster Chunk) + Metadaten.
+
+    Für Clustering/Auto-Sammlungen. Link-Snapshots werden ausgenommen.
+    """
+    rows = (
+        table.search()
+        .where("chunk_index = 0 AND source_type != 'link'")
+        .select(["uri", "title", "tags", "source_type", "vector"])
+        .limit(_MAX_SCAN)
+        .to_list()
+    )
+    return rows
+
+
+def set_collection(table, uri: str, name: str) -> None:
+    """Sammlung einer Quelle setzen (ohne Neu-Embedding)."""
+    table.update(
+        where=f"uri = '{_sql_str(uri)}'",
+        values={"collection": name},
+    )
+
+
 def upsert_link(table, record: dict) -> None:
     table.delete(f"id = '{_sql_str(record['id'])}'")
     table.add([record])

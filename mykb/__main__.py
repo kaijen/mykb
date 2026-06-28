@@ -24,6 +24,8 @@ def _tags(value: str | None) -> list[str]:
 def cmd_index(args, cfg) -> None:
     from .ingest import Ingestor
 
+    if getattr(args, "enrich", False):
+        cfg.enrich = True
     ing = Ingestor(cfg)
     total = 0
     if args.source in {"documents", "all"}:
@@ -36,6 +38,8 @@ def cmd_index(args, cfg) -> None:
 def cmd_web(args, cfg) -> None:
     from .ingest import Ingestor
 
+    if getattr(args, "enrich", False):
+        cfg.enrich = True
     ing = Ingestor(cfg)
     result = ing.ingest_url(args.url, collection=args.collection, tags=_tags(args.tags))
     if result is None:
@@ -61,6 +65,20 @@ def cmd_links(args, cfg) -> None:
         print(f"\n{len(rows)} Link(s)")
 
 
+def cmd_collections(args, cfg) -> None:
+    from . import collections as coll
+
+    suggestions = coll.suggest(cfg, threshold=args.threshold)
+    for sug in suggestions:
+        print(f"# {sug['label']}  ({len(sug['uris'])})")
+        for title in sug["titles"]:
+            print(f"   - {title}")
+    print(f"\n{len(suggestions)} Cluster (threshold={args.threshold})")
+    if args.apply:
+        n = coll.apply(cfg, suggestions)
+        print(f"angewendet: collection für {n} Quellen gesetzt")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mykb", description="Persönlicher Wissensspeicher")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -69,13 +87,24 @@ def build_parser() -> argparse.ArgumentParser:
     p_index.add_argument(
         "--source", choices=["documents", "notes", "all"], default="all"
     )
+    p_index.add_argument(
+        "--enrich", action="store_true", help="Zusammenfassung + Auto-Tags (Ollama)"
+    )
     p_index.set_defaults(func=cmd_index)
 
     p_web = sub.add_parser("web", help="Einzelne Web-Seite indexieren")
     p_web.add_argument("url")
     p_web.add_argument("--collection", default="")
     p_web.add_argument("--tags", default="")
+    p_web.add_argument("--enrich", action="store_true", help="Anreicherung (Ollama)")
     p_web.set_defaults(func=cmd_web)
+
+    p_coll = sub.add_parser(
+        "collections", help="Themen-Cluster vorschlagen (Auto-Sammlungen)"
+    )
+    p_coll.add_argument("--threshold", type=float, default=0.6)
+    p_coll.add_argument("--apply", action="store_true", help="collection-Feld setzen")
+    p_coll.set_defaults(func=cmd_collections)
 
     p_links = sub.add_parser("links", help="Linksammlung (Linkwarden)")
     links_sub = p_links.add_subparsers(dest="links_cmd", required=True)

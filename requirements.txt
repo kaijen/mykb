@@ -2,6 +2,7 @@
 sentence-transformers>=3.3.0
 lancedb>=0.15.0
 torch>=2.4.0
+numpy>=1.26.0  # u. a. für Auto-Sammlungen (Clustering)
 
 # Dokument-Extraktion
 pypdf>=5.1.0

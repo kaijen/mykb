@@ -74,11 +74,16 @@ cp .env.example .env          # Pfade/Device/Linkwarden anpassen
 #   data/documents/   (PDF/MD/TXT)
 #   data/notes/       (Markdown)
 
-# Indexieren
+# Indexieren (optional mit KI-Anreicherung: Zusammenfassung + Auto-Tags)
 python -m mykb index --source all
+python -m mykb index --source all --enrich     # benötigt laufendes Ollama
 
 # Web-Seite aufnehmen
 python -m mykb web https://example.org/artikel --tags infosec,lesen
+
+# Auto-Sammlungen (Themen-Cluster vorschlagen / anwenden)
+python -m mykb collections
+python -m mykb collections --apply
 
 # Linksammlung (benötigt LINKWARDEN_URL + LINKWARDEN_TOKEN)
 python -m mykb links sync
@@ -105,7 +110,12 @@ Im MCP-Client als SSE-Endpoint eintragen:
 | `search_knowledge(query, source_types?, collection?, limit?)` | semantische Suche über alle Quelltypen, optional gefiltert |
 | `find_links(query, only_alive?, limit?)` | Link-Snapshots durchsuchen + Bookmark-Status (Erreichbarkeit) |
 | `find_related(uri, limit?)` | semantisch verwandte Inhalte zu einem Element (fabric-Stil „associations") |
+| `recent_items(limit?, source_types?)` | zuletzt hinzugefügte Elemente (Timeline) |
 | `get_document_context(uri, chunk_index, window?)` | benachbarte Chunks einer Fundstelle |
+
+**MCP-Prompts (Patterns):** `summarize`, `extract_wisdom`, `extract_claims`,
+`action_items` — kuratierte Analyse-Prompts, in Claude auf eine `uri` anwendbar
+(der Server hängt den Volltext an die Anweisung an).
 
 ## Verzeichnisstruktur
 
@@ -132,9 +142,11 @@ Linkwarden).
 - [x] Web-Ingestion (HTML → Text)
 - [x] Linkwarden-Connector + Link-Rot-Prüfung
 - [x] Bessere Web-Extraktion (trafilatura, bs4-Fallback)
-- [x] MCP-Server: `search_knowledge`, `find_links`, `find_related`, `get_document_context`
-- [ ] KI-Anreicherung beim Ingest (Zusammenfassung + Auto-Tags via Ollama) — fabric-inspiriert
-- [ ] „Patterns" als MCP-Prompts (summarize, extract_wisdom, …)
+- [x] MCP-Server: `search_knowledge`, `find_links`, `find_related`, `recent_items`, `get_document_context`
+- [x] KI-Anreicherung beim Ingest (Zusammenfassung + Auto-Tags via Ollama) — fabric-inspiriert
+- [x] „Patterns" als MCP-Prompts (summarize, extract_wisdom, …)
+- [x] Auto-Sammlungen (Themen-Clustering) + Timeline
+- [ ] Breitere Capture-Quellen (Readwise, YouTube-Transkripte, OCR)
 - [ ] Reranking-Stufe (gte-multilingual-reranker) produktiv
 - [ ] VPS-Sync festlegen (rsync vs. S3) und automatisieren
 - [ ] `deploy/` produktiv härten (alle Daten remote → Absicherung kritisch)
