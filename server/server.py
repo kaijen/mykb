@@ -146,7 +146,9 @@ def find_links(
 
     Args:
         query: Suchanfrage in natürlicher Sprache.
-        only_alive: nur Links mit Status ``ok`` zurückgeben.
+        only_alive: bekannt tote Links (``broken``/``timeout``/``error``)
+            ausblenden. Ungeprüfte (``unchecked``) und erreichbare (``ok``)
+            Links werden zurückgegeben.
         limit: Anzahl Treffer (Default aus SEARCH_RETURN_K).
     """
     hits = _run_search(query, "source_type = 'link'", limit)
@@ -158,7 +160,10 @@ def find_links(
     for hit in hits:
         link = meta.get(hit.get("url", ""), {})
         status = link.get("status", "unchecked")
-        if only_alive and status != "ok":
+        # „alive" = nicht bekannt tot. Ungeprüfte (unchecked) Links bleiben
+        # sichtbar — frisch synchronisierte Links wären sonst unauffindbar,
+        # bis 'mykb links check' lief.
+        if only_alive and status in {"broken", "timeout", "error"}:
             continue
         results.append(
             {

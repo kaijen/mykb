@@ -64,8 +64,11 @@ stateDiagram-v2
     broken --> ok: wieder erreichbar
 ```
 
-Das MCP-Tool `find_links(query, only_alive=True)` liefert standardmäßig nur
-Links mit Status `ok` — siehe [MCP-Server](mcp-server.md).
+Das MCP-Tool `find_links(query, only_alive=True)` blendet standardmäßig nur
+**bekannt tote** Links (`broken`/`timeout`/`error`) aus; erreichbare (`ok`) und
+noch **ungeprüfte** (`unchecked`) Links werden geliefert — frisch
+synchronisierte Links sind also sofort auffindbar. Siehe
+[MCP-Server](mcp-server.md).
 
 !!! tip "Planmäßig prüfen"
     `links check` lässt sich per Cron oder systemd-Timer regelmäßig ausführen,
