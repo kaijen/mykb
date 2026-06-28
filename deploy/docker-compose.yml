@@ -1,0 +1,74 @@
+# Remote-Betrieb: Traefik (TLS/ACME) + Authelia (Forward-Auth, 2FA) vor dem
+# MCP-Server. GERÜST — vor Produktivbetrieb anpassen:
+#   - DOMAIN und ACME-E-Mail setzen
+#   - Authelia-Config und Secrets befüllen (siehe deploy/authelia/)
+#   - Bei vertraulichen Dokumenten: NICHT auf öffentlichem VPS (siehe CLAUDE.md)
+#
+# Secrets kommen über Docker Secrets / .env, NIE ins Repo.
+
+x-domain: &domain "${DOMAIN:-rag.example.com}"
+
+services:
+  traefik:
+    image: traefik:v3.1
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # HTTP -> HTTPS erzwingen (TLS erzwingen, siehe CLAUDE.md).
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.email=${ACME_EMAIL:-admin@example.com}"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  authelia:
+    image: authelia/authelia:4.38
+    restart: unless-stopped
+    volumes:
+      - "./authelia:/config"
+    environment:
+      - "TZ=Europe/Berlin"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(`auth.${DOMAIN:-rag.example.com}`)"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.tls.certresolver=le"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+      # Forward-Auth-Middleware, die der MCP-Router unten referenziert.
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.${DOMAIN:-rag.example.com}"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+
+  mcp:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    environment:
+      - "LANCE_DB_PATH=/data/lance"
+      - "SOURCE_DOCS_PATH=/data/literatur"
+      # Im Container per Default CPU; GPU erfordert CUDA-Image + Runtime.
+      - "EMBED_DEVICE=${EMBED_DEVICE:-cpu}"
+      - "MCP_HOST=0.0.0.0"
+      - "MCP_PORT=8000"
+    volumes:
+      # Quelldokumente read-only, Index beschreibbar.
+      - "../data/literatur:/data/literatur:ro"
+      - "../data/lance:/data/lance"
+      - "./model-cache:/cache"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mcp.rule=Host(`${DOMAIN:-rag.example.com}`)"
+      - "traefik.http.routers.mcp.entrypoints=websecure"
+      - "traefik.http.routers.mcp.tls.certresolver=le"
+      - "traefik.http.routers.mcp.middlewares=authelia@docker"
+      - "traefik.http.services.mcp.loadbalancer.server.port=8000"
