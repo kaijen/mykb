@@ -31,7 +31,10 @@ def create_app(cfg: Config):
     from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile
     from pydantic import BaseModel
 
+    from .scheduler import Trigger
+
     app = FastAPI(title="mykb capture", version="0.1.0")
+    trigger = Trigger(cfg.trigger_path)
 
     class UrlIn(BaseModel):
         url: str
@@ -65,6 +68,7 @@ def create_app(cfg: Config):
             logger.error("capture_url_failed", error=str(exc)[:200])
             raise HTTPException(502, "Linkwarden-Aufruf fehlgeschlagen")
 
+        trigger.fire()  # zeitnahe Verarbeitung durch den Watcher anstoßen
         logger.info("captured_url", who=who, url=item.url[:80])
         return {"status": "queued", "target": "linkwarden", "url": item.url}
 
@@ -84,6 +88,7 @@ def create_app(cfg: Config):
         data = await file.read()
         dest.write_bytes(data)
 
+        trigger.fire()  # zeitnahe Verarbeitung durch den Watcher anstoßen
         logger.info("captured_file", who=who, path=str(dest), bytes=len(data))
         return {"status": "queued", "target": "inbox", "path": str(dest)}
 

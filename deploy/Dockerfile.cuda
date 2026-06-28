@@ -8,9 +8,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DEBIAN_FRONTEND=noninteractive \
     PATH=/opt/venv/bin:$PATH
 
-# Python + venv (umgeht PEP 668 auf Ubuntu 24.04).
+# Python + venv (umgeht PEP 668 auf Ubuntu 24.04). rsync + ssh für den
+# Index-Sync, den der Watcher direkt nach 'process' ausführt.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 python3-venv python3-pip \
+    && apt-get install -y --no-install-recommends \
+        python3 python3-venv python3-pip rsync openssh-client \
     && rm -rf /var/lib/apt/lists/* \
     && python3 -m venv /opt/venv
 

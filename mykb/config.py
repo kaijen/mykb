@@ -57,6 +57,24 @@ class Config:
     )
     link_check_concurrency: int = int(os.getenv("LINK_CHECK_CONCURRENCY", "8"))
 
+    # --- Scheduler / ereignisgesteuerte Verarbeitung ('mykb watch') ---
+    # Capture setzt eine Trigger-Datei (gemeinsames State-Volume); der Watcher
+    # verarbeitet debounced und spiegelt danach per rsync.
+    state_dir: str = os.getenv("STATE_DIR", "./data/state")
+    # Ruhezeit nach der letzten Übergabe, bevor ein Lauf startet (Bursts bündeln).
+    process_debounce: float = float(os.getenv("PROCESS_DEBOUNCE", "30"))
+    # Maximaler Abstand ohne Trigger (Fallback, hält u. a. Link-Rot aktuell).
+    process_interval: int = int(os.getenv("PROCESS_INTERVAL", "3600"))
+    # Poll-Takt des Watchers.
+    watch_poll: float = float(os.getenv("WATCH_POLL", "5"))
+    # Sync direkt nach erfolgreichem Lauf (rsync). Leer = kein Sync.
+    vps_ssh_target: str = os.getenv("VPS_SSH_TARGET", "")
+    ssh_key: str = os.getenv("SSH_KEY", "/key")
+
+    @property
+    def trigger_path(self) -> str:
+        return os.path.join(self.state_dir, "capture.trigger")
+
     # --- KI-Anreicherung (lokaler LLM via Ollama, CPU) ---
     # Aus, bis aktiv geschaltet (ENRICH=1 oder CLI --enrich). Greift nicht ins
     # VRAM-Budget ein (läuft auf CPU/RAM, siehe Hardware-Arbeitsteilung).

@@ -2,8 +2,10 @@
 
 Dokumente und Links lassen sich von überall an den Laptop übergeben — über das
 bestehende **Tailscale**-Netz. Ein schlanker **Capture-Dienst** nimmt Übergaben
-entgegen und legt sie in die **Inbox** (Datei → Quellordner, Link → Linkwarden).
-Das eigentliche Embedding macht ein späterer `mykb process`-Lauf.
+entgegen (Datei → Quellordner, Link → Linkwarden) und **setzt einen Trigger**.
+Der Watcher (`mykb watch`) verarbeitet daraufhin **debounced und zeitnah** und
+spiegelt den Index direkt im Anschluss zum VPS — Erfasstes ist so in der Regel
+nach 1–2 Minuten durchsuchbar statt erst nach einem Intervall.
 
 ```mermaid
 flowchart LR
@@ -15,9 +17,11 @@ flowchart LR
         TSS --> CAP[Capture-Dienst<br/>127.0.0.1:8765]
         CAP -->|Datei| INB[(Inbox:<br/>data/documents · data/notes)]
         CAP -->|URL| LW[Linkwarden]
-        INB --> PROC[mykb process<br/>Timer/cron]
-        LW -->|links sync| PROC
-        PROC --> DB[(LanceDB)]
+        CAP -.Trigger.-> W[mykb watch]
+        INB --> W
+        LW -->|links sync| W
+        W --> DB[(LanceDB)]
+        W ==>|rsync| VPS[(VPS)]
     end
 ```
 
@@ -44,21 +48,23 @@ tailscale serve status                 # zeigt die URL
 # erreichbar als:  https://<laptop>.<tailnet>.ts.net/
 ```
 
-## Inbox verarbeiten
+## Verarbeitung
 
-Übergaben werden nur entgegengenommen. Die schwere GPU-Arbeit erledigt:
+Im **Docker-Betrieb** übernimmt das der `scheduler`-Container automatisch
+(`mykb watch`): er reagiert auf den Capture-Trigger (Ruhezeit `PROCESS_DEBOUNCE`,
+damit Bursts gebündelt werden), bzw. spätestens nach `PROCESS_INTERVAL`, und
+spiegelt danach direkt per rsync zum VPS.
 
 ```bash
-python -m mykb process        # index (documents+notes) + links sync
-python -m mykb process --enrich
+# läuft als scheduler-Container; manuell zum Testen:
+python -m mykb watch          # Trigger-gesteuert + Fallback-Intervall
+python -m mykb process        # einmaliger Lauf (index + links sync)
 ```
 
-!!! tip "Planmäßig verarbeiten"
-    `mykb process` per systemd-Timer (empfohlen) oder Cron laufen lassen, dann
-    ist Erfasstes ohne Handgriff bald durchsuchbar. Fertige Vorlagen inkl.
-    Anleitung liegen unter `deploy/systemd/` (Timer + Capture-Service) und
-    `deploy/cron/`. Der systemd-Timer holt mit `Persistent=true` verpasste Läufe
-    nach (Laptop war aus/schlief).
+!!! tip "Ohne Docker"
+    Statt `watch` kann `mykb process` per systemd-Timer (empfohlen) oder Cron
+    laufen — Vorlagen unter `deploy/systemd/` und `deploy/cron/`. Der
+    systemd-Timer holt mit `Persistent=true` verpasste Läufe nach.
 
 ## Übergeben
 

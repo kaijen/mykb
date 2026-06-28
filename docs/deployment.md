@@ -9,13 +9,13 @@ flowchart LR
     subgraph Laptop [Laptop · docker-compose.laptop.yml]
         CAP[capture] --> DOCS[(documents/notes)]
         CAP --> LWC[linkwarden]
-        SCH[scheduler · GPU<br/>mykb process] --> LNC[(lance)]
+        CAP -.Trigger.-> SCH
+        SCH[scheduler · GPU<br/>mykb watch] --> LNC[(lance)]
         DOCS --> SCH
         LWC -->|links sync| SCH
         OLL[ollama] -.Anreicherung.-> SCH
-        LNC --> SY[sync · rsync]
     end
-    SY ==>|rsync/SSH| LNV[(lance-Kopie)]
+    SCH ==>|rsync nach jedem Lauf| LNV[(lance-Kopie)]
     subgraph VPS [VPS · docker-compose.yml]
         TR[traefik TLS] --> AU[authelia 2FA] --> MCP[mcp]
         LNV --> MCP
@@ -44,10 +44,11 @@ docker compose -f deploy/docker-compose.laptop.yml exec ollama ollama pull llama
 tailscale serve --bg 8765              # Capture im Tailnet veröffentlichen
 ```
 
-- **capture** (CPU) nimmt Übergaben entgegen (siehe
+- **capture** (CPU) nimmt Übergaben entgegen und setzt einen Trigger (siehe
   [Von unterwegs erfassen](capture.md)).
-- **scheduler** ruft `mykb process` periodisch (`PROCESS_INTERVAL`) auf der GPU.
-- **sync** schiebt `lance` per rsync zum VPS (`VPS_SSH_TARGET`, `SYNC_INTERVAL`).
+- **scheduler** (`mykb watch`, GPU) reagiert auf den Trigger (debounced) bzw. das
+  Fallback-Intervall, verarbeitet die Inbox und spiegelt `lance` **direkt danach**
+  per rsync zum VPS (`VPS_SSH_TARGET`). Ein separater sync-Container entfällt.
 
 ## VPS (Abfragen)
 
@@ -72,12 +73,13 @@ docker compose -f deploy/docker-compose.yml up -d --build
 - **Rate Limiting** — Authelia-`regulation` gegen Brute-Force.
 - **Secrets** — über `deploy/.env` / Docker Secrets, nie im Repo.
 
-## Sync (rsync-Sidecar)
+## Sync (im scheduler)
 
-Der `sync`-Container spiegelt das `lance`-Verzeichnis per `rsync` über SSH zum
-VPS. Voraussetzung: ein SSH-Key (`SSH_KEY`, als Datei gemountet) und das Ziel
-`VPS_SSH_TARGET` (z. B. `user@vps:/srv/mykb/data/lance/`). Da `mykb process`
-idempotent ist, genügt ein periodischer Lauf.
+Der `scheduler` spiegelt das `lance`-Verzeichnis per `rsync` über SSH zum VPS —
+**direkt nach jedem `process`-Lauf**, also nie mitten in einen Schreibvorgang.
+Voraussetzung: ein SSH-Key (`SSH_KEY`, als Datei gemountet) und das Ziel
+`VPS_SSH_TARGET` (z. B. `user@vps:/srv/mykb/data/lance/`). Ohne `VPS_SSH_TARGET`
+wird der Sync übersprungen.
 
 !!! note "Ohne Docker"
     `deploy/systemd/` und `deploy/cron/` sind die **bare-metal-Alternative**

@@ -108,14 +108,18 @@ class Linkwarden:
         }
 
 
-def sync_from_linkwarden(cfg: Config) -> int:
-    """Links aus Linkwarden übernehmen und ihre Inhalte indexieren."""
+def sync_from_linkwarden(cfg: Config, ingestor: Ingestor | None = None) -> int:
+    """Links aus Linkwarden übernehmen und ihre Inhalte indexieren.
+
+    ``ingestor`` kann übergeben werden, um den bereits geladenen Embedder
+    wiederzuverwenden (z. B. im Watcher) statt das Modell neu zu laden.
+    """
     lw = Linkwarden(cfg)
     if not lw.available():
         logger.error("linkwarden_not_configured")
         return 0
 
-    ing = Ingestor(cfg)  # teilt Embedder + documents-Tabelle
+    ing = ingestor or Ingestor(cfg)  # teilt Embedder + documents-Tabelle
     links_table = store.ensure_links(ing.db)
 
     items = lw.fetch_links()
