@@ -13,6 +13,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY mykb/ mykb/
 COPY scripts/ scripts/
 COPY server/ server/
 
@@ -22,5 +23,5 @@ VOLUME ["/data", "/cache"]
 EXPOSE 8000
 
 # Default: MCP-Server starten. Indexierung via
-#   docker compose run --rm mcp python scripts/index_literature.py --target all
+#   docker compose run --rm mcp python -m mykb index --source all
 CMD ["python", "server/server.py"]

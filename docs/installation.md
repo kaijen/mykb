@@ -6,6 +6,9 @@
 - Für GPU-Betrieb: CUDA-fähige GPU. Das Referenz-Setup nutzt eine GPU mit
   **4 GB VRAM** (Engpass) und **64 GB System-RAM**. CPU-only ist möglich
   (langsamer, siehe [Konfiguration](konfiguration.md)).
+- Optional: **Ollama** für die KI-Anreicherung (läuft auf CPU, siehe
+  [KI-Features](ki-features.md)).
+- Optional: **Linkwarden** als Bookmark-Frontend (siehe [Linksammlung](links.md)).
 - Optional für den Remote-Betrieb: Docker und Docker Compose.
 
 ## Einrichtung
@@ -33,31 +36,36 @@ Anschließend in `.env` mindestens Pfade und Device prüfen:
 
 ```bash
 LANCE_DB_PATH=./data/lance
-SOURCE_DOCS_PATH=./data/literatur
+SOURCE_DOCS_PATH=./data/documents
+NOTES_PATH=./data/notes
 EMBED_DEVICE=cuda        # oder cpu
 ```
 
 Die vollständige Parameterliste steht unter [Konfiguration](konfiguration.md).
 
-## Quelldokumente ablegen
+## Quellen ablegen
 
-Dokumente in die vorgesehenen Ordner legen (unterstützt: `.pdf`, `.md`, `.txt`,
-`.markdown`):
+Dateien in die vorgesehenen Ordner legen (unterstützt: `.pdf`, `.md`,
+`.markdown`, `.txt`):
 
 ```
-data/literatur/standards/   # ISO, BSI, NIST   -> Tabelle "standards"
-data/literatur/research/    # Risk-Paper        -> Tabelle "risk_papers"
+data/documents/   # lokale Dokumente -> source_type=document
+data/notes/       # eigene Notizen    -> source_type=note
 ```
+
+Ein Unterordner unter `documents/` bzw. `notes/` wird als `collection`
+übernommen.
 
 !!! warning "Daten werden nicht versioniert"
-    `data/literatur/` und `data/lance/` sind über `.gitignore` ausgeschlossen.
-    Dokumente können vertraulich sein — siehe [Deployment](deployment.md),
-    Abschnitt Sicherheit.
+    `data/documents/`, `data/notes/` und `data/lance/` sind über `.gitignore`
+    ausgeschlossen. Inhalte können privat sein — siehe
+    [Deployment](deployment.md), Abschnitt Sicherheit.
 
 ## Modelle
 
-Die Embedding- und Reranker-Modelle werden beim ersten Lauf automatisch von
-Hugging Face geladen und lokal zwischengespeichert (`HF_HOME`). Es ist kein
-manueller Download nötig.
+Embedder (und optionaler Reranker) werden beim ersten Lauf automatisch von
+Hugging Face geladen und lokal zwischengespeichert (`HF_HOME`). Kein manueller
+Download nötig. Für die Anreicherung wird zusätzlich ein lokales
+Ollama-Modell benötigt (z. B. `ollama pull llama3.2`).
 
-Weiter mit der [Indexierung](indexierung.md).
+Weiter mit [Inhalte erfassen](erfassen.md).

@@ -1,0 +1,5 @@
+"""mykb — persönlicher Wissensspeicher (Ingestion, Linksammlung, MCP-Suche)."""
+from __future__ import annotations
+
+__all__ = ["__version__"]
+__version__ = "0.1.0"

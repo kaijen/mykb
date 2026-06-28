@@ -29,8 +29,8 @@ cp authelia/users_database.example.yml  authelia/users_database.yml
 # 3. Bauen und starten
 docker compose up -d --build
 
-# 4. Index befüllen (einmalig / nach Dokumentänderungen)
-docker compose run --rm mcp python scripts/index_literature.py --target all
+# 4. Index befüllen (einmalig / nach Änderungen)
+docker compose run --rm mcp python -m mykb index --source all
 ```
 
 ## Hinweise

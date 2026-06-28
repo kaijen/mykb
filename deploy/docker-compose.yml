@@ -55,14 +55,19 @@ services:
     restart: unless-stopped
     environment:
       - "LANCE_DB_PATH=/data/lance"
-      - "SOURCE_DOCS_PATH=/data/literatur"
+      - "SOURCE_DOCS_PATH=/data/documents"
+      - "NOTES_PATH=/data/notes"
       # Im Container per Default CPU; GPU erfordert CUDA-Image + Runtime.
       - "EMBED_DEVICE=${EMBED_DEVICE:-cpu}"
       - "MCP_HOST=0.0.0.0"
       - "MCP_PORT=8000"
+      # Linkwarden optional (für 'mykb links sync'); Secret via .env.
+      # - "LINKWARDEN_URL=${LINKWARDEN_URL:-}"
+      # - "LINKWARDEN_TOKEN=${LINKWARDEN_TOKEN:-}"
     volumes:
-      # Quelldokumente read-only, Index beschreibbar.
-      - "../data/literatur:/data/literatur:ro"
+      # Quellen read-only, Index beschreibbar.
+      - "../data/documents:/data/documents:ro"
+      - "../data/notes:/data/notes:ro"
       - "../data/lance:/data/lance"
       - "./model-cache:/cache"
     labels:
