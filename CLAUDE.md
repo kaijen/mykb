@@ -221,8 +221,9 @@ an: `summarize`, `extract_wisdom`, `extract_claims`, `action_items`
    der VPS LanceDB direkt liest) und automatisieren.
 4. `deploy/`: Compose/Traefik/Authelia produktiv härten (alle Daten remote →
    Absicherung kritisch).
-5. Link-Rot-Prüfung planmäßig ausführen (Cron/systemd-Timer) und Web-Snapshots
-   periodisch auffrischen.
+5. Web-Snapshots periodisch auffrischen. (Planmäßige Verarbeitung inkl.
+   Link-Rot-Prüfung über `mykb process` ist umgesetzt — Vorlagen unter
+   `deploy/systemd/` und `deploy/cron/`.)
 6. Notizen-Quelle: optional Frontmatter/Tags aus Markdown übernehmen.
 
 ### Fabric-inspirierte Ausbaustufen (siehe fabric.so)

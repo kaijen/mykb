@@ -54,8 +54,11 @@ python -m mykb process --enrich
 ```
 
 !!! tip "Planmäßig verarbeiten"
-    `mykb process` per systemd-Timer/Cron laufen lassen (z. B. stündlich), dann
-    ist Erfasstes ohne Handgriff bald durchsuchbar.
+    `mykb process` per systemd-Timer (empfohlen) oder Cron laufen lassen, dann
+    ist Erfasstes ohne Handgriff bald durchsuchbar. Fertige Vorlagen inkl.
+    Anleitung liegen unter `deploy/systemd/` (Timer + Capture-Service) und
+    `deploy/cron/`. Der systemd-Timer holt mit `Persistent=true` verpasste Läufe
+    nach (Laptop war aus/schlief).
 
 ## Übergeben
 
