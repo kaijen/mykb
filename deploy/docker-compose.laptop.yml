@@ -1,0 +1,126 @@
+# Erstellen-Seite (Laptop). Ziel: am Host nur Docker + NVIDIA Container Toolkit.
+#
+#   docker compose -f deploy/docker-compose.laptop.yml up -d --build
+#
+# Variablen in deploy/.env setzen (siehe deploy/.env.example). Den Capture-Dienst
+# anschließend im Tailnet veröffentlichen:  tailscale serve --bg 8765
+
+services:
+  # Erfassen von unterwegs (CPU). Lauscht im Container auf 0.0.0.0, wird aber nur
+  # an den Host-localhost gemappt — die Tailnet-Freigabe macht 'tailscale serve'.
+  capture:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.cuda
+    image: mykb:cuda
+    restart: unless-stopped
+    command: ["python", "-m", "mykb", "capture"]
+    environment:
+      - CAPTURE_HOST=0.0.0.0
+      - CAPTURE_PORT=8765
+      - LINKWARDEN_URL=http://linkwarden:3000
+      - LINKWARDEN_TOKEN=${LINKWARDEN_TOKEN:-}
+      - SOURCE_DOCS_PATH=/data/documents
+      - NOTES_PATH=/data/notes
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - ../data/documents:/data/documents
+      - ../data/notes:/data/notes
+    depends_on:
+      - linkwarden
+
+  # Verarbeitet die Inbox periodisch (index + links sync) auf der GPU.
+  # 'mykb process' ist idempotent (content_hash) — die Schleife ersetzt damit die
+  # Nachhol-Logik eines systemd-Timers.
+  scheduler:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.cuda
+    image: mykb:cuda
+    restart: unless-stopped
+    command:
+      - bash
+      - -lc
+      - 'while true; do python -m mykb process || echo "process fehlgeschlagen"; sleep "$${PROCESS_INTERVAL:-3600}"; done'
+    environment:
+      - PROCESS_INTERVAL=${PROCESS_INTERVAL:-3600}
+      - EMBED_DEVICE=cuda
+      - LANCE_DB_PATH=/data/lance
+      - SOURCE_DOCS_PATH=/data/documents
+      - NOTES_PATH=/data/notes
+      - ENRICH=${ENRICH:-1}
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
+      - LINKWARDEN_URL=http://linkwarden:3000
+      - LINKWARDEN_TOKEN=${LINKWARDEN_TOKEN:-}
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ../data/documents:/data/documents:ro
+      - ../data/notes:/data/notes:ro
+      - ../data/lance:/data/lance
+      - hf_cache:/cache
+    depends_on:
+      - ollama
+      - linkwarden
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Lokaler LLM für die KI-Anreicherung (CPU). Modell einmalig ziehen:
+  #   docker compose -f deploy/docker-compose.laptop.yml exec ollama ollama pull llama3.2
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama_models:/root/.ollama
+
+  # Bookmark-Frontend. capture legt Links hier ab; scheduler zieht sie per sync.
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:latest
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/postgres
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-changeme}
+      - NEXTAUTH_URL=${LINKWARDEN_NEXTAUTH_URL:-http://localhost:3000}
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - linkwarden_data:/data/data
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # rsync-Sidecar: schiebt das lance-Verzeichnis zum VPS. SSH-Key als Datei
+  # mounten (absoluter Pfad in deploy/.env: SSH_KEY) und VPS_SSH_TARGET setzen,
+  # z. B. user@vps:/srv/mykb/data/lance/
+  sync:
+    image: instrumentisto/rsync-ssh:latest
+    restart: unless-stopped
+    environment:
+      - VPS_SSH_TARGET=${VPS_SSH_TARGET:-}
+      - SYNC_INTERVAL=${SYNC_INTERVAL:-1800}
+    command:
+      - sh
+      - -c
+      - 'while true; do [ -n "$$VPS_SSH_TARGET" ] && rsync -az --delete -e "ssh -i /key -o StrictHostKeyChecking=accept-new" /data/lance/ "$$VPS_SSH_TARGET" || echo "sync uebersprungen/fehlgeschlagen"; sleep "$$SYNC_INTERVAL"; done'
+    volumes:
+      - ../data/lance:/data/lance:ro
+      - ${SSH_KEY:-/dev/null}:/key:ro
+
+volumes:
+  hf_cache:
+  ollama_models:
+  linkwarden_data:
+  pgdata:

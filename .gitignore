@@ -33,9 +33,14 @@ data/lance/**
 .env
 .env.local
 deploy/authelia/secrets/
+deploy/authelia/configuration.yml
 deploy/authelia/users_database.yml
 *.pem
 *.key
+
+# Docker-Laufzeitartefakte (nicht versionieren)
+deploy/letsencrypt/
+deploy/model-cache/
 
 # MkDocs-Build
 site/

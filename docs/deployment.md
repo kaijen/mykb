@@ -1,81 +1,84 @@
 # Deployment
 
-mykb trennt bewusst zwei Seiten: **Erstellen** (Laptop, GPU) und **Abfragen**
-(VPS, CPU). Beide nutzen denselben asymmetrischen Embedder.
+mykb läuft **Docker-first** auf zwei Maschinen — am Host ist nur Docker nötig
+(am Laptop zusätzlich das **NVIDIA Container Toolkit** für die GPU). Bewusste
+Trennung: **Erstellen** (Laptop, GPU) und **Abfragen** (VPS, CPU).
 
 ```mermaid
 flowchart LR
-    subgraph Laptop [Erstellen · Laptop · GPU]
-        ING[index / web / links]
-        EMB[Qwen3-Embedding FP16]
-        ENR[Ollama-Anreicherung]
-        ING --> EMB
-        ENR -.-> ING
+    subgraph Laptop [Laptop · docker-compose.laptop.yml]
+        CAP[capture] --> DOCS[(documents/notes)]
+        CAP --> LWC[linkwarden]
+        SCH[scheduler · GPU<br/>mykb process] --> LNC[(lance)]
+        DOCS --> SCH
+        LWC -->|links sync| SCH
+        OLL[ollama] -.Anreicherung.-> SCH
+        LNC --> SY[sync · rsync]
     end
-    DB[(LanceDB<br/>documents · links)]
-    EMB --> DB
-    DB ==>|Sync: rsync / S3<br/>noch offen| DBV[(LanceDB-Kopie)]
-    subgraph VPS [Abfragen · VPS · CPU]
-        TR[Traefik TLS] --> AU[Authelia 2FA] --> SRV[MCP-Server]
-        DBV --> SRV
+    SY ==>|rsync/SSH| LNV[(lance-Kopie)]
+    subgraph VPS [VPS · docker-compose.yml]
+        TR[traefik TLS] --> AU[authelia 2FA] --> MCP[mcp]
+        LNV --> MCP
     end
+    PH[Handy/Rechner] -->|Tailscale| CAP
     CL[Claude] <-->|SSE| TR
 ```
 
 !!! danger "Alle Daten landen auf dem VPS"
-    Entscheidung: der gesamte Speicher wird synchronisiert — also können auch
-    **private/vertrauliche Inhalte** remote liegen. Die Absicherung ist daher
-    **Pflicht**: TLS erzwingen, Authelia 2FA, Rate Limiting, Logging. Streng
-    vertrauliche (z. B. NDA-gebundene) Dokumente im Zweifel in einer getrennten,
-    lokalen Instanz halten.
+    Der gesamte `lance`-Index wird auf den VPS gespiegelt — also können auch
+    **private/vertrauliche Inhalte** remote liegen. Absicherung ist daher
+    **Pflicht**: TLS, Authelia 2FA, Rate Limiting, Logging. Streng vertrauliche
+    Dokumente im Zweifel in einer getrennten, lokalen Instanz halten.
 
-## Inhalt von `deploy/`
+## Laptop (Erstellen)
 
-| Datei | Zweck |
-|---|---|
-| `Dockerfile` | Image für Ingest + MCP-Server |
-| `docker-compose.yml` | Traefik + Authelia + MCP-Server |
-| `authelia/configuration.example.yml` | Authelia-Config (Vorlage) |
-| `authelia/users_database.example.yml` | Benutzerdatenbank (Vorlage) |
-
-## Inbetriebnahme
+`docker-compose.laptop.yml` startet **capture**, **scheduler** (Embedding auf
+der GPU), **ollama**, **linkwarden** (+postgres) und den **sync**-Sidecar.
 
 ```bash
-cd deploy
+cp deploy/.env.example deploy/.env     # Secrets, SSH_KEY, VPS_SSH_TARGET …
 
-# 1. Domain und ACME-E-Mail setzen
-export DOMAIN=mykb.example.com ACME_EMAIL=admin@example.com
+docker compose -f deploy/docker-compose.laptop.yml up -d --build
+docker compose -f deploy/docker-compose.laptop.yml exec ollama ollama pull llama3.2
 
-# 2. Authelia konfigurieren (Secrets NICHT ins Repo)
-cp authelia/configuration.example.yml   authelia/configuration.yml
-cp authelia/users_database.example.yml  authelia/users_database.yml
-#    -> Secrets/Hashes setzen, default_policy bleibt deny
+tailscale serve --bg 8765              # Capture im Tailnet veröffentlichen
+```
 
-# 3. Bauen und starten
-docker compose up -d --build
+- **capture** (CPU) nimmt Übergaben entgegen (siehe
+  [Von unterwegs erfassen](capture.md)).
+- **scheduler** ruft `mykb process` periodisch (`PROCESS_INTERVAL`) auf der GPU.
+- **sync** schiebt `lance` per rsync zum VPS (`VPS_SSH_TARGET`, `SYNC_INTERVAL`).
 
-# 4. Index befüllen (einmalig / nach Änderungen)
-docker compose run --rm mcp python -m mykb index --source all
+## VPS (Abfragen)
+
+`docker-compose.yml` startet **Traefik + Authelia + MCP-Server**. Der
+MCP-Container liest nur den gespiegelten `lance`-Index (read-only) und rechnet
+auf CPU.
+
+```bash
+cp deploy/.env.example deploy/.env     # DOMAIN, ACME_EMAIL …
+cp deploy/authelia/configuration.example.yml   deploy/authelia/configuration.yml
+cp deploy/authelia/users_database.example.yml  deploy/authelia/users_database.yml
+#   -> Secrets/Hashes setzen, default_policy bleibt deny
+
+docker compose -f deploy/docker-compose.yml up -d --build
 ```
 
 ## Sicherheitsmerkmale
 
-- **TLS erzwingen** — HTTP wird auf HTTPS umgeleitet, Zertifikate via
-  Let's Encrypt (ACME).
+- **TLS erzwingen** — HTTP → HTTPS, Zertifikate via Let's Encrypt (ACME).
 - **2FA** — Authelia-`default_policy` ist `deny`; der MCP-Router nutzt die
   `authelia@docker`-Middleware (`two_factor`).
 - **Rate Limiting** — Authelia-`regulation` gegen Brute-Force.
-- **Secrets** — über Docker Secrets / Environment, nie im Repo.
+- **Secrets** — über `deploy/.env` / Docker Secrets, nie im Repo.
 
-## Sync (noch offen)
+## Sync (rsync-Sidecar)
 
-LanceDB sind nur Dateien. Der Transport Laptop → VPS ist bewusst noch nicht
-festgelegt — Optionen: `rsync` über SSH oder Object Storage (S3/MinIO), aus dem
-der VPS direkt liest. Die Konfiguration ist über Environment-Variablen bereits
-entkoppelt (siehe [Konfiguration](konfiguration.md)).
+Der `sync`-Container spiegelt das `lance`-Verzeichnis per `rsync` über SSH zum
+VPS. Voraussetzung: ein SSH-Key (`SSH_KEY`, als Datei gemountet) und das Ziel
+`VPS_SSH_TARGET` (z. B. `user@vps:/srv/mykb/data/lance/`). Da `mykb process`
+idempotent ist, genügt ein periodischer Lauf.
 
-## GPU im Container
-
-Das Default-Image ist CPU-only (passt zur VPS-Abfrageseite). Für GPU-Ingest ein
-CUDA-Basisimage wählen, das nvidia-Runtime im Compose aktivieren und
-`EMBED_DEVICE=cuda` setzen.
+!!! note "Ohne Docker"
+    `deploy/systemd/` und `deploy/cron/` sind die **bare-metal-Alternative**
+    (lokales venv) und für den reinen Docker-Betrieb nicht nötig.

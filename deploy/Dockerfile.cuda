@@ -1,0 +1,32 @@
+# Laptop-Image (Erstellen-Seite): CUDA-Runtime für GPU-Embedding.
+# Wird von capture + scheduler im docker-compose.laptop.yml genutzt.
+FROM nvidia/cuda:12.4.1-runtime-ubuntu24.04
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HF_HOME=/cache/huggingface \
+    DEBIAN_FRONTEND=noninteractive \
+    PATH=/opt/venv/bin:$PATH
+
+# Python + venv (umgeht PEP 668 auf Ubuntu 24.04).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 python3-venv python3-pip \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m venv /opt/venv
+
+WORKDIR /app
+
+COPY requirements.txt .
+# torch (Standard-Wheel) bringt die CUDA-Laufzeit mit und nutzt mit dem
+# CUDA-Basisimage die GPU.
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY mykb/ mykb/
+COPY scripts/ scripts/
+COPY server/ server/
+
+# Daten und Modell-Cache werden als Volumes gemountet.
+VOLUME ["/data", "/cache"]
+
+# Default-Kommando wird im Compose je Service gesetzt (capture / process).
+CMD ["python", "-m", "mykb", "--help"]
