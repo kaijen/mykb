@@ -6,8 +6,11 @@
 # anschließend im Tailnet veröffentlichen:  tailscale serve --bg 8765
 
 services:
-  # Erfassen von unterwegs (CPU). Lauscht im Container auf 0.0.0.0, wird aber nur
-  # an den Host-localhost gemappt — die Tailnet-Freigabe macht 'tailscale serve'.
+  # Erfassen von unterwegs (CPU), direct-Modus: schreibt direkt in Inbox/Linkwarden.
+  # Für Ausfallsicherheit läuft der Annahmepunkt besser als Queue-Intake auf dem
+  # VPS (siehe docker-compose.yml) — dann ist dieser lokale capture optional und
+  # nur „lowest latency, wenn du am Laptop bist". Lauscht auf 0.0.0.0, gemappt an
+  # Host-localhost; Tailnet-Freigabe via 'tailscale serve'.
   capture:
     build:
       context: ..
@@ -59,6 +62,10 @@ services:
       # Sync direkt nach jedem Lauf (leer = aus).
       - VPS_SSH_TARGET=${VPS_SSH_TARGET:-}
       - SSH_KEY=/key
+      # Queue vom VPS ziehen (Puffer für Laptop-Ausfall). Leer = aus.
+      - QUEUE_DIR=/state/queue
+      - QUEUE_PULL_SOURCE=${QUEUE_PULL_SOURCE:-}
+      - QUEUE_POLL=${QUEUE_POLL:-60}
       - NVIDIA_VISIBLE_DEVICES=all
     volumes:
       - ../data/documents:/data/documents:ro

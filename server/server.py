@@ -28,6 +28,7 @@ from mykb import store
 from mykb.config import DOCS_TABLE, SOURCE_TYPES, load_config
 from mykb.embedder import Embedder
 from mykb.patterns import PATTERNS
+from mykb.status import collect_status
 
 logger = structlog.get_logger()
 
@@ -194,6 +195,15 @@ def find_related(uri: str, limit: int | None = None) -> list[dict]:
         return []
     rows = store.related(table, uri, CFG.top_k)
     return rows[: (limit or CFG.return_k)]
+
+
+@mcp.tool()
+def kb_status() -> dict:
+    """Betrieblicher Status des Wissensspeichers: Bestände je Quelltyp,
+    Link-Status, Queue-Rückstand sowie letzter Verarbeitungs-/Sync-Zeitpunkt.
+    Spiegelt den Stand des Knotens, auf dem der Server läuft.
+    """
+    return collect_status(CFG)
 
 
 @mcp.tool()

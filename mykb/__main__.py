@@ -78,6 +78,40 @@ def cmd_watch(args, cfg) -> None:
     watch(cfg)
 
 
+def cmd_status(args, cfg) -> None:
+    """Betrieblicher Status: Bestände, Queue-Rückstand, letzter Lauf/Sync."""
+    import json as _json
+
+    from .status import collect_status
+
+    st = collect_status(cfg)
+    if getattr(args, "json", False):
+        print(_json.dumps(st, ensure_ascii=False, indent=2))
+        return
+
+    docs = st.get("documents", {})
+    print(f"Dokumente: {docs.get('total_sources', 0)} Quellen, {docs.get('total_chunks', 0)} Chunks")
+    for stype, n in sorted(docs.get("sources_by_type", {}).items()):
+        print(f"   {stype:9} {n}")
+    links = st.get("links", {})
+    if links:
+        by = ", ".join(f"{k}={v}" for k, v in sorted(links.get("by_status", {}).items()))
+        print(f"Links: {links.get('total', 0)} ({by})")
+    print(f"Queue-Rückstand: {st.get('queue_pending', 0)}")
+    print(f"Letzter Lauf:    {st.get('last_process') or '—'}")
+    print(f"Letzter Sync:    {st.get('last_sync') or '—'}")
+    if st.get("store_error"):
+        print(f"(Index nicht erreichbar: {st['store_error']})")
+
+
+def cmd_drain(args, cfg) -> None:
+    """Queue (Puffer) ziehen und in Inbox/Linkwarden übernehmen."""
+    from .scheduler import pull_and_drain
+
+    n = pull_and_drain(cfg)
+    logger.info("drained", items=n)
+
+
 def cmd_process(args, cfg) -> None:
     """Inbox verarbeiten: lokale Quellen indexieren und Links aus Linkwarden ziehen."""
     from . import links
@@ -144,6 +178,17 @@ def build_parser() -> argparse.ArgumentParser:
         "watch", help="Ereignisgesteuert verarbeiten (Capture-Trigger + Intervall, dann Sync)"
     )
     p_watch.set_defaults(func=cmd_watch)
+
+    p_drain = sub.add_parser(
+        "drain", help="Queue ziehen + in Inbox/Linkwarden übernehmen (Puffer leeren)"
+    )
+    p_drain.set_defaults(func=cmd_drain)
+
+    p_status = sub.add_parser(
+        "status", help="Bestände, Queue-Rückstand, letzter Lauf/Sync"
+    )
+    p_status.add_argument("--json", action="store_true", help="als JSON ausgeben")
+    p_status.set_defaults(func=cmd_status)
 
     p_coll = sub.add_parser(
         "collections", help="Themen-Cluster vorschlagen (Auto-Sammlungen)"

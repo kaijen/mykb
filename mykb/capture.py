@@ -35,6 +35,7 @@ def create_app(cfg: Config):
 
     app = FastAPI(title="mykb capture", version="0.1.0")
     trigger = Trigger(cfg.trigger_path)
+    queue_mode = cfg.capture_mode == "queue"
 
     class UrlIn(BaseModel):
         url: str
@@ -46,12 +47,29 @@ def create_app(cfg: Config):
     def health() -> dict:
         return {"status": "ok"}
 
+    @app.get("/status")
+    def status() -> dict:
+        """Bestände, Queue-Rückstand, letzte Verarbeitung/Sync (für die PWA)."""
+        from .status import collect_status
+
+        return collect_status(cfg)
+
     @app.post("/capture/url", status_code=202)
     def capture_url(
         item: UrlIn,
         who: str | None = Header(default=None, alias="Tailscale-User-Login"),
     ) -> dict:
-        """URL an Linkwarden übergeben; mykb zieht sie via 'links sync'."""
+        """URL übergeben. queue-Modus: durabel einreihen. direct-Modus: an
+        Linkwarden, mykb zieht sie via 'links sync'."""
+        if queue_mode:
+            from . import queue
+
+            qid = queue.enqueue_url(
+                cfg, item.url, tags=item.tags, note=item.note or "", collection=item.collection or ""
+            )
+            logger.info("captured_url", who=who, url=item.url[:80], queued=qid)
+            return {"status": "queued", "target": "queue", "id": qid}
+
         from .links import Linkwarden
 
         lw = Linkwarden(cfg)
@@ -79,13 +97,24 @@ def create_app(cfg: Config):
         collection: str = Form(""),
         who: str | None = Header(default=None, alias="Tailscale-User-Login"),
     ) -> dict:
-        """Datei in den Quellordner (Inbox) ablegen; Indexierung folgt später."""
+        """Datei übergeben. queue-Modus: durabel einreihen. direct-Modus: in den
+        Quellordner (Inbox); Indexierung folgt durch den Watcher."""
+        data = await file.read()
+
+        if queue_mode:
+            from . import queue
+
+            qid = queue.enqueue_file(
+                cfg, file.filename, data, kind=kind, collection=collection
+            )
+            logger.info("captured_file", who=who, queued=qid, bytes=len(data))
+            return {"status": "queued", "target": "queue", "id": qid}
+
         root = Path(cfg.notes_path if kind == "note" else cfg.docs_path)
         target_dir = root / collection if collection else root
         target_dir.mkdir(parents=True, exist_ok=True)
 
         dest = target_dir / _safe_name(file.filename)
-        data = await file.read()
         dest.write_bytes(data)
 
         trigger.fire()  # zeitnahe Verarbeitung durch den Watcher anstoßen

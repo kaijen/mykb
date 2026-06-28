@@ -44,6 +44,17 @@ class Config:
     # `tailscale serve` (nur Tailnet-Mitglieder, HTTPS via MagicDNS).
     capture_host: str = os.getenv("CAPTURE_HOST", "127.0.0.1")
     capture_port: int = int(os.getenv("CAPTURE_PORT", "8765"))
+    # 'direct' (Laptop): direkt in Inbox/Linkwarden + Trigger.
+    # 'queue' (immer-erreichbarer Knoten, z. B. VPS): durabel einreihen, damit
+    # Übergaben nicht verloren gehen, wenn der Laptop aus ist.
+    capture_mode: str = os.getenv("CAPTURE_MODE", "direct")
+
+    # --- Queue (Puffer für Laptop-Ausfall) ---
+    queue_dir: str = os.getenv("QUEUE_DIR", os.path.join(os.getenv("STATE_DIR", "./data/state"), "queue"))
+    # rsync-Quelle, von der der Laptop die Queue zieht (leer = kein Pull).
+    queue_pull_source: str = os.getenv("QUEUE_PULL_SOURCE", "")
+    # Wie oft der Watcher die entfernte Queue zieht (Sekunden).
+    queue_poll: float = float(os.getenv("QUEUE_POLL", "60"))
     top_k: int = int(os.getenv("SEARCH_TOP_K", "20"))
     return_k: int = int(os.getenv("SEARCH_RETURN_K", "5"))
     rerank_model: str | None = os.getenv("RERANK_MODEL") or None

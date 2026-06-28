@@ -182,6 +182,27 @@ def upsert_link(table, record: dict) -> None:
     table.add([record])
 
 
+def counts(table) -> dict:
+    """Bestände: Chunks gesamt und distinct Quellen (uri) je source_type."""
+    rows = (
+        table.search().select(["uri", "source_type"]).limit(_MAX_SCAN).to_list()
+    )
+    seen: set[tuple[str, str]] = set()
+    by_type: dict[str, int] = {}
+    for r in rows:
+        key = (r.get("source_type", ""), r.get("uri", ""))
+        if key in seen:
+            continue
+        seen.add(key)
+        st = r.get("source_type", "")
+        by_type[st] = by_type.get(st, 0) + 1
+    return {
+        "total_chunks": table.count_rows(),
+        "total_sources": len(seen),
+        "sources_by_type": by_type,
+    }
+
+
 def all_links(table) -> list[dict]:
     return (
         table.search().select(list(schema.LINK_FIELDS)).limit(_MAX_SCAN).to_list()
