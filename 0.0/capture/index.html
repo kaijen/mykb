@@ -12,13 +12,13 @@
         <meta name="author" content="Kai Jendrian">
       
       
-        <link rel="canonical" href="https://kaijen.github.io/mykb/0.0/mcp-server/">
+        <link rel="canonical" href="https://kaijen.github.io/mykb/0.0/capture/">
       
       
-        <link rel="prev" href="../ki-features/">
+        <link rel="prev" href="../erfassen/">
       
       
-        <link rel="next" href="../konfiguration/">
+        <link rel="next" href="../links/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>MCP-Server - mykb — persönlicher Wissensspeicher</title>
+        <title>Von unterwegs erfassen - mykb — persönlicher Wissensspeicher</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mcp-server" class="md-skip">
+        <a href="#von-unterwegs-erfassen-tailscale" class="md-skip">
           Zum Inhalt
         </a>
       
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MCP-Server
+              Von unterwegs erfassen
             
           </span>
         </div>
@@ -346,10 +346,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../capture/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Von unterwegs erfassen
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -365,6 +392,109 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Inhaltsverzeichnis">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Inhaltsverzeichnis
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dienst-starten-und-im-tailnet-veroffentlichen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dienst starten und im Tailnet veröffentlichen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inbox-verarbeiten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbox verarbeiten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ubergeben" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Übergeben
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Übergeben">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mit-dem-helfer-mykb-send" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mit dem Helfer mykb-send
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mit-curl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mit curl
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vom-handy-ios-kurzbefehle-android" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vom Handy (iOS Kurzbefehle / Android)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpunkte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpunkte
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -427,37 +557,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MCP-Server
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../mcp-server/" class="md-nav__link">
         
   
   
@@ -473,92 +576,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Inhaltsverzeichnis">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Inhaltsverzeichnis
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#starten" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Starten
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-claude-einbinden" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In Claude einbinden
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tools
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prompts-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prompts (Patterns)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#wie-die-suche-ablauft" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wie die Suche abläuft
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#datenschutz-im-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Datenschutz im Log
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -671,10 +688,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#starten" class="md-nav__link">
+  <a href="#dienst-starten-und-im-tailnet-veroffentlichen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Starten
+        Dienst starten und im Tailnet veröffentlichen
       
     </span>
   </a>
@@ -682,10 +699,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-claude-einbinden" class="md-nav__link">
+  <a href="#inbox-verarbeiten" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In Claude einbinden
+        Inbox verarbeiten
       
     </span>
   </a>
@@ -693,43 +710,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tools" class="md-nav__link">
+  <a href="#ubergeben" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tools
+        Übergeben
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Übergeben">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mit-dem-helfer-mykb-send" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mit dem Helfer mykb-send
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#prompts-patterns" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#mit-curl" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prompts (Patterns)
+        Mit curl
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#wie-die-suche-ablauft" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#vom-handy-ios-kurzbefehle-android" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Wie die Suche abläuft
+        Vom Handy (iOS Kurzbefehle / Android)
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#datenschutz-im-log" class="md-nav__link">
+  <a href="#endpunkte" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Datenschutz im Log
+        Endpunkte
       
     </span>
   </a>
@@ -753,7 +787,7 @@
 
 
   
-    <a href="https://github.com/kaijen/mykb/edit/main/docs/mcp-server.md" title="Seite editieren" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/kaijen/mykb/edit/main/docs/capture.md" title="Seite editieren" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -761,96 +795,109 @@
   
 
 
-<h1 id="mcp-server">MCP-Server<a class="headerlink" href="#mcp-server" title="Permanent link">&para;</a></h1>
-<p><code>server/server.py</code> stellt den LanceDB-Wissensspeicher als <strong>MCP-Server</strong>
-(FastMCP, SSE-Transport) bereit. Claude bindet ihn als Werkzeug ein und kann
-den Speicher semantisch durchsuchen, Verwandtes finden und Patterns anwenden.</p>
-<h2 id="starten">Starten<a class="headerlink" href="#starten" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>server/server.py
+<h1 id="von-unterwegs-erfassen-tailscale">Von unterwegs erfassen (Tailscale)<a class="headerlink" href="#von-unterwegs-erfassen-tailscale" title="Permanent link">&para;</a></h1>
+<p>Dokumente und Links lassen sich von überall an den Laptop übergeben — über das
+bestehende <strong>Tailscale</strong>-Netz. Ein schlanker <strong>Capture-Dienst</strong> nimmt Übergaben
+entgegen und legt sie in die <strong>Inbox</strong> (Datei → Quellordner, Link → Linkwarden).
+Das eigentliche Embedding macht ein späterer <code>mykb process</code>-Lauf.</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph Unterwegs
+        PH[Handy / Rechner&lt;br/&gt;mykb-send · Shortcut · curl]
+    end
+    PH --&gt;|Tailscale · HTTPS| TSS[tailscale serve]
+    subgraph Laptop
+        TSS --&gt; CAP[Capture-Dienst&lt;br/&gt;127.0.0.1:8765]
+        CAP --&gt;|Datei| INB[(Inbox:&lt;br/&gt;data/documents · data/notes)]
+        CAP --&gt;|URL| LW[Linkwarden]
+        INB --&gt; PROC[mykb process&lt;br/&gt;Timer/cron]
+        LW --&gt;|links sync| PROC
+        PROC --&gt; DB[(LanceDB)]
+    end</code></pre>
+<div class="admonition info">
+<p class="admonition-title">Der Laptop muss online sein</p>
+<p>Tailscale stellt die Verbindung her, <strong>weckt</strong> den Laptop aber nicht. Ist er
+aus/schlafend, schlägt die Übergabe fehl (per Wake-on-LAN über einen anderen
+Tailnet-Knoten ließe sich das ergänzen).</p>
+</div>
+<h2 id="dienst-starten-und-im-tailnet-veroffentlichen">Dienst starten und im Tailnet veröffentlichen<a class="headerlink" href="#dienst-starten-und-im-tailnet-veroffentlichen" title="Permanent link">&para;</a></h2>
+<p>Der Dienst bindet bewusst an <strong>localhost</strong>; die Veröffentlichung im Tailnet
+(HTTPS via MagicDNS, nur für Tailnet-Mitglieder) übernimmt <code>tailscale serve</code>.
+Ein eigener Token entfällt — der Zugriffsschutz läuft über die
+Tailnet-Identität/ACLs.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 1. Capture-Dienst auf dem Laptop</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>capture<span class="w">                 </span><span class="c1"># lauscht auf 127.0.0.1:8765</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># 2. Im Tailnet als HTTPS veröffentlichen (nur Tailnet-Mitglieder)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>tailscale<span class="w"> </span>serve<span class="w"> </span>--bg<span class="w"> </span><span class="m">8765</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>tailscale<span class="w"> </span>serve<span class="w"> </span>status<span class="w">                 </span><span class="c1"># zeigt die URL</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># erreichbar als:  https://&lt;laptop&gt;.&lt;tailnet&gt;.ts.net/</span>
 </code></pre></div>
-<p>Der Server lauscht auf <code>MCP_HOST:MCP_PORT</code> (Default <code>0.0.0.0:8000</code>) und bietet
-den SSE-Endpoint unter <code>/sse</code> an.</p>
-<h2 id="in-claude-einbinden">In Claude einbinden<a class="headerlink" href="#in-claude-einbinden" title="Permanent link">&para;</a></h2>
-<p>In der MCP-Client-Konfiguration (VSCode <code>settings.json</code> oder Claude Desktop)
-einen SSE-Server eintragen:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;mykb&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://localhost:8000/sse&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
+<h2 id="inbox-verarbeiten">Inbox verarbeiten<a class="headerlink" href="#inbox-verarbeiten" title="Permanent link">&para;</a></h2>
+<p>Übergaben werden nur entgegengenommen. Die schwere GPU-Arbeit erledigt:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>process<span class="w">        </span><span class="c1"># index (documents+notes) + links sync</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python<span class="w"> </span>-m<span class="w"> </span>mykb<span class="w"> </span>process<span class="w"> </span>--enrich
 </code></pre></div>
-<p>Im Remote-Betrieb steht statt <code>localhost</code> die über Traefik veröffentlichte
-Domain (mit TLS und Authelia davor, siehe <a href="../deployment/">Deployment</a>).</p>
-<h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Planmäßig verarbeiten</p>
+<p><code>mykb process</code> per systemd-Timer (empfohlen) oder Cron laufen lassen, dann
+ist Erfasstes ohne Handgriff bald durchsuchbar. Fertige Vorlagen inkl.
+Anleitung liegen unter <code>deploy/systemd/</code> (Timer + Capture-Service) und
+<code>deploy/cron/</code>. Der systemd-Timer holt mit <code>Persistent=true</code> verpasste Läufe
+nach (Laptop war aus/schlief).</p>
+</div>
+<h2 id="ubergeben">Übergeben<a class="headerlink" href="#ubergeben" title="Permanent link">&para;</a></h2>
+<h3 id="mit-dem-helfer-mykb-send">Mit dem Helfer <code>mykb-send</code><a class="headerlink" href="#mit-dem-helfer-mykb-send" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MYKB_CAPTURE_URL</span><span class="o">=</span>https://laptop.&lt;tailnet&gt;.ts.net
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>scripts/mykb-send.sh<span class="w"> </span>url<span class="w">  </span>https://example.org/artikel<span class="w"> </span><span class="s2">&quot;infosec,lesen&quot;</span><span class="w"> </span><span class="s2">&quot;kurze Notiz&quot;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>scripts/mykb-send.sh<span class="w"> </span>file<span class="w"> </span>~/Downloads/paper.pdf<span class="w"> </span>document<span class="w"> </span>forschung
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>scripts/mykb-send.sh<span class="w"> </span>file<span class="w"> </span>~/notizen/idee.md<span class="w"> </span>note
+</code></pre></div>
+<h3 id="mit-curl">Mit curl<a class="headerlink" href="#mit-curl" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Link -&gt; Linkwarden</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://laptop.&lt;tailnet&gt;.ts.net/capture/url<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;url&quot;:&quot;https://example.org&quot;,&quot;tags&quot;:[&quot;lesen&quot;],&quot;note&quot;:&quot;&quot;}&#39;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># Datei -&gt; Inbox (document|note, optional collection)</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://laptop.&lt;tailnet&gt;.ts.net/capture/file<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span>-F<span class="w"> </span><span class="nv">kind</span><span class="o">=</span>document<span class="w"> </span>-F<span class="w"> </span><span class="nv">collection</span><span class="o">=</span>infosec<span class="w"> </span>-F<span class="w"> </span><span class="nv">file</span><span class="o">=</span>@./paper.pdf
+</code></pre></div>
+<h3 id="vom-handy-ios-kurzbefehle-android">Vom Handy (iOS Kurzbefehle / Android)<a class="headerlink" href="#vom-handy-ios-kurzbefehle-android" title="Permanent link">&para;</a></h3>
+<p>Einen Kurzbefehl/Share-Sheet-Eintrag anlegen, der den geteilten Inhalt per
+<strong>POST</strong> an die Capture-URL schickt — URLs an <code>/capture/url</code> (JSON), Dateien an
+<code>/capture/file</code> (Multipart). So genügen zum Erfassen zwei Taps.</p>
+<h2 id="endpunkte">Endpunkte<a class="headerlink" href="#endpunkte" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Tool</th>
+<th>Methode</th>
+<th>Pfad</th>
 <th>Zweck</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>search_knowledge(query, source_types?, collection?, limit?)</code></td>
-<td>semantische Suche über alle Quelltypen, optional gefiltert</td>
+<td><code>GET</code></td>
+<td><code>/health</code></td>
+<td>Statusprüfung</td>
 </tr>
 <tr>
-<td><code>find_links(query, only_alive?, limit?)</code></td>
-<td>Link-Snapshots durchsuchen + Bookmark-Status</td>
+<td><code>POST</code></td>
+<td><code>/capture/url</code></td>
+<td>URL an Linkwarden übergeben (JSON: <code>url</code>, <code>tags</code>, <code>note</code>, <code>collection</code>)</td>
 </tr>
 <tr>
-<td><code>find_related(uri, limit?)</code></td>
-<td>semantisch verwandte Inhalte zu einem Element</td>
-</tr>
-<tr>
-<td><code>recent_items(limit?, source_types?)</code></td>
-<td>zuletzt hinzugefügte Elemente (Timeline)</td>
-</tr>
-<tr>
-<td><code>get_document_context(uri, chunk_index, window?)</code></td>
-<td>benachbarte Chunks einer Fundstelle</td>
+<td><code>POST</code></td>
+<td><code>/capture/file</code></td>
+<td>Datei in die Inbox (Multipart: <code>file</code>, <code>kind</code>, <code>collection</code>)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="prompts-patterns">Prompts (Patterns)<a class="headerlink" href="#prompts-patterns" title="Permanent link">&para;</a></h2>
-<p>Zusätzlich stehen kuratierte Analyse-Prompts bereit, anwendbar auf eine <code>uri</code>:
-<code>summarize</code>, <code>extract_wisdom</code>, <code>extract_claims</code>, <code>action_items</code> — Details unter
-<a href="../ki-features/">KI-Features</a>.</p>
-<h2 id="wie-die-suche-ablauft">Wie die Suche abläuft<a class="headerlink" href="#wie-die-suche-ablauft" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>sequenceDiagram
-    participant C as Claude
-    participant S as MCP-Server
-    participant E as Embedder (Qwen3)
-    participant DB as LanceDB
-    C-&gt;&gt;S: search_knowledge(query, ...)
-    S-&gt;&gt;E: Query-Embedding (Instruction-Prefix)
-    E--&gt;&gt;S: Vektor
-    S-&gt;&gt;DB: Vektorsuche Top-K (+ Filter)
-    DB--&gt;&gt;S: Kandidaten
-    opt RERANK_MODEL gesetzt
-        S-&gt;&gt;S: Cross-Encoder sortiert um
-    end
-    S--&gt;&gt;C: Top-N Treffer (ohne Vektor)</code></pre>
-<ol>
-<li><strong>Query-Embedding</strong> mit Qwen3-Instruction-Prefix (asymmetrisch, gespiegelt
-   aus der Ingestion — siehe <a href="../architektur/">Architektur</a>).</li>
-<li>LanceDB liefert die Top-<code>SEARCH_TOP_K</code> Kandidaten, optional mit Filter
-   (Quelltyp/Sammlung).</li>
-<li><strong>Optional:</strong> Ist <code>RERANK_MODEL</code> gesetzt, sortiert ein Cross-Encoder um
-   (defensiv: schlägt das Laden fehl, läuft die Suche ohne Reranking weiter).</li>
-<li>Die Top-<code>SEARCH_RETURN_K</code> Treffer gehen zurück — ohne den Vektor.</li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Performance</p>
-<p>Modelle werden erst beim ersten Tool-Aufruf geladen (langer Start, knappes
-VRAM-Budget) und danach zwischengespeichert.</p>
-</div>
-<h2 id="datenschutz-im-log">Datenschutz im Log<a class="headerlink" href="#datenschutz-im-log" title="Permanent link">&para;</a></h2>
-<p>Queries werden nur <strong>gekürzt</strong> geloggt (Vorschau), niemals als Klartext. Logs
-sind strukturiert (JSON über <code>structlog</code>).</p>
-<p>Weiter mit der <a href="../konfiguration/">Konfiguration</a>.</p>
+<p>Hochgeladene Dateinamen werden entschärft (kein Pfad-Traversal); übergebene
+Links landen via Linkwarden-API als Bookmark und kommen beim nächsten
+<code>links sync</code> in den Index.</p>
 
 
 
